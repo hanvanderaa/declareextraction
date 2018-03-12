@@ -33,4 +33,8 @@ java -jar DeclareExtractor.jar "A claim must be created before it can be approve
 
 ## Acknowledgments
 
-* Stanford CoreNLP 
+Our approach builds on the Stanford CoreNLP library:
+Manning, Christopher D., Mihai Surdeanu, John Bauer, Jenny Finkel, Steven J. Bethard, and David McClosky. 2014. The Stanford CoreNLP Natural Language Processing Toolkit In Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics: System Demonstrations, pp. 55-60.
+
+We are grateful to team from Stanford for their development efforts.
+
