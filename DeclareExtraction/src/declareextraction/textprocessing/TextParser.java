@@ -165,7 +165,9 @@ public class TextParser {
 			
 			if (reln.equals("nsubjpass") || reln.equals("dobj")) {
 				NounPhrase object = model.getNounPhraseByIndex(td.dep().index());
-				govA.setObject(object);
+				if (govA != null) {
+					govA.setObject(object);
+				}
 			}
 			if (reln.equals("nsubj")) {
 				if (govA != null) {

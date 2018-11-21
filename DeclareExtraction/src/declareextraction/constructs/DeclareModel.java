@@ -7,12 +7,20 @@ public class DeclareModel {
 
 	String text;
 	TextModel sentenceModel;
+	int collection;
+	int ID;
 	
 	List<DeclareConstraint> constraints;
 	
-	
 	public DeclareModel(String text) {
 		this.text = text;
+		constraints = new ArrayList<DeclareConstraint>();
+	}
+	
+	public DeclareModel(int collection, int ID, String text) {
+		this.text = text;
+		this.collection = collection;
+		this.ID = ID;
 		constraints = new ArrayList<DeclareConstraint>();
 	}
 		
@@ -35,6 +43,14 @@ public class DeclareModel {
 
 	public void addConstraint(DeclareConstraint c) {
 		constraints.add(c);
+	}
+	
+	public int getID() {
+		return ID;
+	}
+	
+	public int getCollection() {
+		return collection;
 	}
 
 

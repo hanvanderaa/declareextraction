@@ -2,7 +2,7 @@
 
 This projects provides enables the automated extraction of declarative process models from natural language texts. The provided code provides an implementation for the approach described in the following paper:
 
-Van der Aa, H., Di Ciccio, C., Leopold, H., & Reijers, H.A. (2018) Extracting Declarative Process Models from Natural Language Text. Currently under submission at the International Conference on Business Process Management.
+Van der Aa, H., Di Ciccio, C., Leopold, H., & Reijers, H.A. (2019) Extracting Declarative Process Models from Natural Language Text. Currently under submission at CAiSE.
 
 ### Prerequisites
 
@@ -12,7 +12,7 @@ The provided source code is set up as a Maven Project, which means that Maven is
 
 ### Installing
 
-All required dependencies are provided as Maven dependencies in pom.xml. 
+All required dependencies are provided as Maven dependencies in pom.xml.
 
 Can be run as a .JAR file or as an Eclipse project
 
@@ -23,8 +23,8 @@ There are two ways to run the implementation.
 1. To apply the approach on a single description, the description can be passed as an argument when running the project. E.g.:
 java -jar DeclareExtractor.jar "A claim must be created before it can be approved"
 
-2. To apply and evaluate the approach on a collection of descriptions, these descriptions can be provided as a .csv file. 
-- The .csv file should be set up using the same structure as declareextraction/DeclareExtraction/input/datacollection.csv 
+2. To apply and evaluate the approach on a collection of descriptions, these descriptions can be provided as a .csv file.
+- The .csv file should be set up using the same structure as declareextraction/DeclareExtraction/input/datacollection.csv
 - The path to the .csv file should be specified using the variable declareExtraction.main.DeclareExtractor.CONSTRAINT_FILE
 - This method is performed when running the project without arguments specified
 
@@ -38,4 +38,3 @@ Our approach builds on the Stanford CoreNLP library:
 Manning, Christopher D., Mihai Surdeanu, John Bauer, Jenny Finkel, Steven J. Bethard, and David McClosky. 2014. The Stanford CoreNLP Natural Language Processing Toolkit In Proceedings of the 52nd Annual Meeting of the Association for Computational Linguistics: System Demonstrations, pp. 55-60.
 
 We are grateful to team from Stanford for their development efforts.
-

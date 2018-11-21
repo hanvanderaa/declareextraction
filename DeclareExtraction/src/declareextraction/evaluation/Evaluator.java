@@ -9,18 +9,27 @@ import declareextraction.constructs.DeclareConstraint;
 import declareextraction.constructs.DeclareModel;
 
 public class Evaluator {
-
-	int ttp = 0;
-	int tfp = 0;
-	int tfn = 0;
-	int typeErrors = 0;
-	int actErrors = 0;
 	
 	DecimalFormat df = new DecimalFormat("####0.00");
 	
+	Map<Integer, Integer> tpm = new HashMap<Integer, Integer>();
+	Map<Integer, Integer> fpm = new HashMap<Integer, Integer>();
+	Map<Integer, Integer> fnm = new HashMap<Integer, Integer>();
+	Map<Integer, Integer> tem = new HashMap<Integer, Integer>();
+	Map<Integer, Integer> aem = new HashMap<Integer, Integer>();
+	
 	
 	public Object[] evaluateCase(DeclareModel generated, DeclareModel gs) {
-			
+		int col = gs.getCollection();
+		
+		if (!tpm.containsKey(col)) {
+			tpm.put(col, 0);
+			fpm.put(col, 0);
+			fnm.put(col, 0);
+			tem.put(col, 0);
+			aem.put(col, 0);
+		}
+		
 		int mtp = 0;
 		int mfp = 0;
 		int mfn = 0;
@@ -34,6 +43,7 @@ public class Evaluator {
 		for (DeclareConstraint genCon : matches.keySet()) {
 			DeclareConstraint gsCon = matches.get(genCon);
 			
+			
 			int tp = quantifyMatch(genCon, gsCon);
 			int fp = (genCon.size() - tp);
 			int fn;
@@ -42,7 +52,7 @@ public class Evaluator {
 			} else {
 				fn = (gsCon.size() - tp);
 			}
-						
+			
 			mtp = mtp + tp;
 			mfp = mfp + fp;
 			mfn = mfn - tp;
@@ -50,14 +60,14 @@ public class Evaluator {
 			if (fp != 0 && fn != 0) {
 				System.out.println("GS:    " + gsCon);
 				if (genCon.getType() != gsCon.getType()) {
-					typeErrors++;
+					tem.put(col, tem.get(col) + 1);
 					System.out.println("TYPE ERROR. Found: " + genCon.getType() + ". GSType: " + gsCon.getType());
 				}
 				if (!equalActions(genCon.getActionA(), gsCon.getActionA())) {
-					actErrors++;
+					aem.put(col, aem.get(col) + 1);
 				}
 				if (!equalActions(genCon.getActionB(), gsCon.getActionB())) {
-					actErrors++;
+					aem.put(col, aem.get(col) + 1);
 				}
 			}
 		}
@@ -75,14 +85,43 @@ public class Evaluator {
 		double rec = mtp * 1.0 / (mtp + mfn);
 		System.out.println("Case precision: " + df.format(prec) + " recall: " + df.format(rec) + "\n");
 
-		ttp = ttp + mtp;
-		tfp = tfp + mfp;
-		tfn = tfn + mfn;
+		tpm.put(col, tpm.get(col) + mtp);
+		fpm.put(col, fpm.get(col) + mfp);
+		fnm.put(col, fnm.get(col) + mfn);
 		
 		return new Object[]{prec, rec, matches};
 	}
 	
+	public void printCollectionResults(int col) {
+		System.out.println("\nCollection: " + col);
+		int ttp = tpm.get(col);
+		int tfp = fpm.get(col);
+		int tfn = fnm.get(col);
+		
+		double prec = ttp * 1.0 / (ttp + tfp);
+		double rec = ttp * 1.0 / (ttp + tfn);
+		
+		System.out.println("Type errors: " + tem.get(col));
+		System.out.println("Activity errors: " + aem.get(col));
+		System.out.println("Overall precision: " + df.format(prec) + " recall: " + df.format(rec));
+	}
+	
 	public void printOverallResults() {
+		int ttp = 0;
+		int tfp = 0;
+		int tfn = 0;
+		int typeErrors = 0;
+		int actErrors = 0;
+		
+		for (int collection : tpm.keySet()) {
+			printCollectionResults(collection);
+			ttp += tpm.get(collection);
+			tfp += fpm.get(collection);
+			tfn += fnm.get(collection);
+			typeErrors += tem.get(collection);
+			actErrors += aem.get(collection);
+		}
+
 		double prec = ttp * 1.0 / (ttp + tfp);
 		double rec = ttp * 1.0 / (ttp + tfn);
 		
@@ -144,10 +183,8 @@ public class Evaluator {
 			return false;
 		}
 		String gsVerb = action2.actionStr().split(" ")[0];
-
-		return (action1.actionStr().toLowerCase().contains(gsVerb));
 		
-//		return (action1.actionStr().trim().equalsIgnoreCase(action2.actionStr().trim()));
+		return (action1.actionStr().toLowerCase().contains(gsVerb)) || (action2.actionStr().contains(action1.getVerb()));
 	}
 	
 	

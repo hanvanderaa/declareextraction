@@ -31,18 +31,18 @@ public class GSReader {
 
 				while ((nextLine = reader.readNext()) != null && nextLine.length > 1 && 
 						!nextLine[0].isEmpty()) {
-					DeclareModel gsModel = new DeclareModel(nextLine[4]);
+					DeclareModel gsModel = new DeclareModel(Integer.parseInt(nextLine[0]), Integer.parseInt(nextLine[4]), nextLine[5]);
 					
-					int gsconstraints = Integer.parseInt(nextLine[5]);
-					boolean isNegative = nextLine[3].equalsIgnoreCase("true");
+					int gsconstraints = Integer.parseInt(nextLine[6]);
+					boolean isNegative = nextLine[7].equalsIgnoreCase("true");
 					for (int i = 0; i < gsconstraints; i++) {
 						DeclareConstraint gsc;
-						ConstraintType type = ConstraintType.getType(nextLine[7 + i * 3]);
-						Action actionA = new Action(nextLine[8 + i * 3]);
-						if (nextLine[9 + i * 3] == null || nextLine[9 + i * 3].isEmpty()) {
+						ConstraintType type = ConstraintType.getType(nextLine[8 + i * 3]);
+						Action actionA = new Action(nextLine[9 + i * 3]);
+						if (nextLine[10 + i * 3] == null || nextLine[10 + i * 3].isEmpty()) {
 							gsc = new DeclareConstraint(type, actionA);
 						} else {
-							Action actionB = new Action(nextLine[9 + i * 3]);
+							Action actionB = new Action(nextLine[10 + i * 3]);
 							gsc = new DeclareConstraint(type, actionA, actionB);
 						}
 						if (isNegative) {

@@ -17,7 +17,7 @@ public DeclareModel convertToDeclareModel(TextModel textModel) {
 		boolean isMeta = false;
 		for (Interrelation rel : textModel.getInterrelations()) {
 		
-			if (isMetaAction(rel.getActionA())) {
+			if (isMetaAction(rel.getActionA()) || isMetaAction(rel.getActionB())) {
 				System.out.println("Identified meta-relation: " + rel);
 				if (WordClasses.isStartVerb(rel.getActionA().getVerb())) {
 					ConstraintType ct = ConstraintType.INIT;
@@ -26,6 +26,14 @@ public DeclareModel convertToDeclareModel(TextModel textModel) {
 					System.out.println("FOUND: " + c);
 					isMeta = true;
 				}
+				if (WordClasses.isStartVerb(rel.getActionB().getVerb())) {
+					ConstraintType ct = ConstraintType.INIT;
+					DeclareConstraint c = new DeclareConstraint(ct, rel.getActionA());
+					declareModel.addConstraint(c);
+					System.out.println("FOUND: " + c);
+					isMeta = true;
+				}
+				
 				if (WordClasses.isEndVerb(rel.getActionA().getVerb())) {
 					ConstraintType ct = ConstraintType.END;
 					DeclareConstraint c = new DeclareConstraint(ct, rel.getActionB());

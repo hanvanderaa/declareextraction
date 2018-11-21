@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import declareextraction.constructs.Action;
+import declareextraction.constructs.ConstraintType;
 import declareextraction.constructs.DeclareModel;
 import declareextraction.constructs.TextModel;
 import declareextraction.evaluation.Evaluator;
@@ -17,7 +18,7 @@ import declareextraction.textprocessing.TextParser;
 public class DeclareExtractor {
 
 	static final int START = 0;
-	static final int END = 200;
+	static final int END = 108;
 	
 	
 	public static final String CONSTRAINT_FILE = "input/datacollection.csv";
@@ -83,27 +84,31 @@ public class DeclareExtractor {
 			if (b >= START && b <= END) {
 				DeclareModel gsModel = gsModels.get(i);			
 				
-				String text = texts.get(i);
-				System.out.println(i + " Parsing case: " + text);
-				TextModel textModel = parser.parseConstraintString(text);
-				
-				System.out.println("Extracted actions:");
-				for (Action a : textModel.getActions()) {
-					System.out.println(a);
-				}
-				System.out.println("Extracted relations:");
-				for (Interrelation rel : textModel.getInterrelations()) {
-					System.out.println(rel);
-				}
-				
-				DeclareModel dm = declareConstructor.convertToDeclareModel(textModel);
-				dm.addTextModel(textModel);
+				if (true) {
+//				if (gsModel.getConstraints().size() == 1) {
 
-				genModels.add(dm);
-				
-				Object[] evalres = eval.evaluateCase(dm, gsModel);
-				evalresultsList.add(evalres);
-				
+					String text = texts.get(i);
+					System.out.println(i + " Parsing case: " + text);
+					TextModel textModel = parser.parseConstraintString(text);
+
+					System.out.println("Extracted actions:");
+					for (Action a : textModel.getActions()) {
+						System.out.println(a);
+					}
+					System.out.println("Extracted relations:");
+					for (Interrelation rel : textModel.getInterrelations()) {
+						System.out.println(rel);
+					}
+
+					DeclareModel dm = declareConstructor.convertToDeclareModel(textModel);
+					dm.addTextModel(textModel);
+
+					genModels.add(dm);
+
+					Object[] evalres = eval.evaluateCase(dm, gsModel);
+					evalresultsList.add(evalres);
+
+				}
 			}
 			b++;
 		}

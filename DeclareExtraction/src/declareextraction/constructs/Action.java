@@ -32,7 +32,7 @@ public class Action {
 	}
 	
 	public Action(String gstext) {
-		this.gstext = gstext;
+		this.gstext = gstext.toLowerCase();
 	}
 
 	public void setModal(String modal) {
