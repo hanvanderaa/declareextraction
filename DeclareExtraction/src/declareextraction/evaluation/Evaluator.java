@@ -171,6 +171,9 @@ public class Evaluator {
 		}
 		if (con2.isNegative() && con1.isNegative()) {
 			res++;
+			if (!(con1.getType() != null && con1.getType() == con2.getType())) {
+				res++;
+			}
 		}
 		return res;
 	}
