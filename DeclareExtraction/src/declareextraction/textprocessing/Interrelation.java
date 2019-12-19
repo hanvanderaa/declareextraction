@@ -4,7 +4,6 @@ import declareextraction.constructs.Action;
 
 public class Interrelation {
 
-	
 	public enum RelationType {
 		FOLLOWS, XOR, AND;
 	}
@@ -77,12 +76,4 @@ public class Interrelation {
 		this.actionB = actionB;
 		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 }

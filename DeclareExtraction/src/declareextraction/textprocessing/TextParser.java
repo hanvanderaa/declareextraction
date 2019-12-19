@@ -47,7 +47,7 @@ public class TextParser {
 		System.out.println("Loading NLP tools.");
 		
 	    String parserModel = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
-	    lp = LexicalizedParser.loadModel(parserModel); //TODO include in init later
+	    lp = LexicalizedParser.loadModel(parserModel);
 		tokenizerFactory =	PTBTokenizer.factory(new CoreLabelTokenFactory(), "");
 		
 	    Properties props;
