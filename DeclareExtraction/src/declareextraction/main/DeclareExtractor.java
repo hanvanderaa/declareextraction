@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import declareextraction.constructs.Action;
-import declareextraction.constructs.ConstraintType;
 import declareextraction.constructs.DeclareModel;
 import declareextraction.constructs.TextModel;
 import declareextraction.evaluation.Evaluator;

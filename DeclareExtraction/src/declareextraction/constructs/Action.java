@@ -149,20 +149,25 @@ public class Action {
 		}
 		StringBuilder sb = new StringBuilder();
 		if (subject != null) {
-			sb.append(subject + " ");
+			sb.append(subject).append(" ");
 		}
-		if (modal != null) {
+//		if (modal != null) {
 //			sb.append(modal + " ");
-		}
+//		}
 		if (isNegative) {
 			sb.append("not ");
 		}
-		sb.append(verb + " " + object);
+
+		sb.append(verb);
+		if (object != null) {
+			sb.append(" ").append(object);
+		}
+
 		return sb.toString().toLowerCase();
 	}
 	
 	public String toString() {
-		return "Action: " + getSubject() + " " + actionStr();
+		return "Action: " + actionStr();
 	}
 
 
