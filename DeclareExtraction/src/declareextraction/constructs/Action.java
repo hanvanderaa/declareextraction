@@ -16,6 +16,7 @@ public class Action {
 	private Set<Action> conjunctions;
 	private boolean pastParticiple;
 	private boolean isNegative;
+	private boolean isImmediate;
 	private boolean isFlowAction;
 	
 	public Action(String verb, int verbID) {
@@ -130,18 +131,22 @@ public class Action {
 	public boolean isPastParticiple() {
 		return pastParticiple;
 	}
-	
-	
 
 	public boolean isNegative() {
 		return isNegative;
 	}
 
-
 	public void setNegative(boolean isNegative) {
 		this.isNegative = isNegative;
 	}
 
+	public boolean isImmediate() {
+		return isImmediate;
+	}
+
+	public void setImmediate(boolean isImmediate){
+		this.isImmediate = isImmediate;
+	}
 
 	public String actionStr() {
 		if (gstext != null) {
@@ -159,6 +164,29 @@ public class Action {
 		}
 
 		sb.append(verb);
+		if (object != null && !object.getText().trim().isEmpty()) {
+			sb.append(" ").append(object);
+		}
+		if (isImmediate) {
+			sb.append(" immediately");
+		}
+
+		return sb.toString().toLowerCase();
+	}
+
+	public String baseStr() {
+		//used for actionB for NOT and CHAIN relations, as those action parts are already part of the constraint type
+		if (gstext != null) {
+			return gstext;
+		}
+
+		StringBuilder sb = new StringBuilder();
+		if (subject != null) {
+			sb.append(subject).append(" ");
+		}
+
+		sb.append(verb);
+
 		if (object != null && !object.getText().trim().isEmpty()) {
 			sb.append(" ").append(object);
 		}

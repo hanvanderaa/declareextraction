@@ -67,12 +67,13 @@ public DeclareModel convertToDeclareModel(TextModel textModel) {
 		ConstraintType constraintType = null;
 		boolean aMand = WordClasses.isMandatory(rel.getActionA().getModal());
 		boolean bMand = WordClasses.isMandatory(rel.getActionB().getModal());
+		boolean bImm = rel.getActionB().isImmediate();
 		if (!bMand) {
-			constraintType = ConstraintType.PRECEDENCE;
-		} if (aMand && bMand) {
-			constraintType = ConstraintType.SUCCESSION;
-		} if (!aMand && bMand) {
-			constraintType = ConstraintType.RESPONSE;
+			constraintType = bImm ? ConstraintType.CHAINPRECEDENCE : ConstraintType.PRECEDENCE;
+		} else if (aMand) {
+			constraintType = bImm ? ConstraintType.CHAINSUCCESSION : ConstraintType.SUCCESSION;
+		} else {
+			constraintType = bImm ? ConstraintType.CHAINRESPONSE : ConstraintType.RESPONSE;
 		}
 
 		DeclareConstraint constraint = new DeclareConstraint(constraintType, rel.getActionA(), rel.getActionB());

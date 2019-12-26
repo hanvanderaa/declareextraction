@@ -68,14 +68,14 @@ public class DeclareConstraint {
     public String toRuMString() {
         StringBuilder sb = new StringBuilder();
 
-        if (isNegative && actionB != null) {
+        if (actionB != null && actionB.isNegative()) {
             sb.append("Not ");
         }
 
         //The order of actions might depend on the constraint
         sb.append(type.getConstraintName()).append('[').append(actionA.actionStr());
         if (actionB != null) {
-            sb.append(", ").append(actionB.actionStr()).append("] | | |");
+            sb.append(", ").append(actionB.baseStr()).append("] | | |");
         } else {
             sb.append("] | |");
         }
