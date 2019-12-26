@@ -316,18 +316,19 @@ public class TextParser {
 			model.addAction(newAction);
 		}
 
-		if (model.getActions().size() == 1) {
-			Action verbAction = model.getActions().get(0);
-			model.getActions().remove(verbAction);
-			for (NounPhrase np : model.getNounPhrases()) {
-				if (verbAction == null || np.getStartIndex() < verbAction.getVerbID()) {
-					model.addAction(new Action(np.toString(), np.getStartIndex()));
-				} else {
-					model.addAction(verbAction);
-					verbAction = null;
-				}
-			}
-		}
+		//Removed with the introduction of EXISTENCE and ABSENCE constraints
+//		if (model.getActions().size() == 1) {
+//			Action verbAction = model.getActions().remove(0);
+//			for (NounPhrase np : model.getNounPhrases()) {
+//				if (verbAction == null || np.getStartIndex() < verbAction.getVerbID()) {
+//					model.addAction(new Action(np.toString(), np.getStartIndex()));
+//				} else {
+//					model.addAction(verbAction);
+//					verbAction = null;
+//				}
+//			}
+//		}
+
 		if (model.getActions().isEmpty()) {
 			for (NounPhrase np : model.getNounPhrases()) {
 				model.addAction(new Action(np.toString(), np.getStartIndex()));

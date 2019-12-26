@@ -72,8 +72,13 @@ public class DeclareConstraint {
             sb.append("Not ");
         }
 
-        //The order of actions might depend on the constraint
-        sb.append(type.getConstraintName()).append('[').append(actionA.actionStr());
+        sb.append(type.getConstraintName()).append('[');
+        if (type.equals(ConstraintType.ABSENCE)) {
+            sb.append(actionA.baseStr());
+        } else {
+            sb.append(actionA.actionStr());
+        }
+
         if (actionB != null) {
             sb.append(", ").append(actionB.baseStr()).append("] | | |");
         } else {
