@@ -21,7 +21,7 @@ public class Action {
 	public Action(String verb, int verbID) {
 		this.verb = verb;
 		this.verbID = verbID;
-		this.conjunctions = new HashSet<Action>();
+		this.conjunctions = new HashSet<>();
 		this.pastParticiple = false;
 		this.isFlowAction = false;
 	}
@@ -159,7 +159,7 @@ public class Action {
 		}
 
 		sb.append(verb);
-		if (object != null) {
+		if (object != null && !object.getText().trim().isEmpty()) {
 			sb.append(" ").append(object);
 		}
 
@@ -201,9 +201,7 @@ public class Action {
 				return false;
 		} else if (!verb.equals(other.verb))
 			return false;
-		if (verbID != other.verbID)
-			return false;
-		return true;
+		return verbID == other.verbID;
 	}
 
 
