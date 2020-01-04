@@ -56,19 +56,33 @@ public class DeclareConstraint {
 
     @Override
     public String toString() {
-        if (actionB == null) {
-            return "Constraint [type=" + type + ", A=" + actionA + "]";
-        }
+        StringBuilder sb = new StringBuilder().append("Constraint [type=");
+
         if (isNegative) {
-            return "Constraint [type= NOT-" + type + ", A=" + actionA + ", B=" + actionB + "]";
+            sb.append("NOT-");
         }
-        return "Constraint [type=" + type + ", A=" + actionA + ", B=" + actionB + "]";
+
+        sb.append(type).append(", A=");
+
+        if(type != null && type.equals(ConstraintType.ABSENCE)) {
+            sb.append("Action: ").append(actionA.baseStr());
+        } else {
+            sb.append(actionA);
+        }
+
+        if (actionB != null) {
+            sb.append(", B=").append("Action: ").append(actionB.baseStr()).append("]");
+        } else {
+            sb.append(']');
+        }
+
+        return sb.toString();
     }
 
     public String toRuMString() {
         StringBuilder sb = new StringBuilder();
 
-        if (actionB != null && actionB.isNegative()) {
+        if (isNegative) {
             sb.append("Not ");
         }
 

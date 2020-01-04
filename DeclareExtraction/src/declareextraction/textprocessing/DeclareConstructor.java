@@ -92,7 +92,7 @@ public class DeclareConstructor {
 		DeclareConstraint constraint = new DeclareConstraint(constraintType, rel.getActionA(), rel.getActionB());
 
 		// check if constraint should be negated
-		if (constraint.getActionA().isNegative() || constraint.getActionB().isNegative()) {
+		if (constraint.getActionB().isNegative()) {
 			constraint.setNegative();
 		}
 		return constraint;

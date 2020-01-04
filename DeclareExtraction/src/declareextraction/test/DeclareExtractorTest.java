@@ -115,7 +115,7 @@ class DeclareExtractorTest {
 
     @Test
     public void failPrecedenceConstraint() {
-        //only one action is originally found, which is turned NounPhrase actions
+        //only one action is originally found, which is turned into NounPhrase actions
         //after changing logic for EXISTENCE and ABSENCE, returns EXISTENCE
         //strangely, changing 'clear' (RB/JJ) to 'cleared' (VBN) fixes the issue, as is seen in constraintTypesCheck
         String text = "once the results are clear the employee is notified";
