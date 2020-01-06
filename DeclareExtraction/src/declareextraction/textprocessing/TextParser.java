@@ -111,8 +111,8 @@ public class TextParser {
 		Annotation sfparse = new Annotation(model.getText());
 		this.pipeline.annotate(sfparse);
 
-		List<String> lemmas = new ArrayList<String>();
-		List<String> poss = new ArrayList<String>();
+		List<String> lemmas = new ArrayList<>();
+		List<String> poss = new ArrayList<>();
 		List<CoreMap> sentences = sfparse.get(SentencesAnnotation.class);
 		for(CoreMap sentence: sentences) {
 			for (CoreLabel token: sentence.get(TokensAnnotation.class)) {
@@ -134,8 +134,8 @@ public class TextParser {
 			}
 		}
 		System.out.println("sentence: " + model.getText());
-		System.out.println(lemmas);
-		System.out.println(poss);
+		//System.out.println(lemmas);
+		//System.out.println(poss);
 	}
 	
 	private void stanfordParsing(TextModel model) {
@@ -162,44 +162,39 @@ public class TextParser {
 			String reln = td.reln().getShortName();
 			Action govA = model.getActionByVerbID(td.gov().index());
 			model.getActionByVerbID(td.dep().index());
-			
-			if (reln.equals("nsubjpass") || reln.equals("dobj")) {
-				NounPhrase object = model.getNounPhraseByIndex(td.dep().index());
-				if (govA != null) {
-					govA.setObject(object);
-				}
-			}
-			if (reln.equals("nsubj")) {
-				if (govA != null) {
-					govA.setSubject(model.getNounPhraseByIndex(td.dep().index()));
-				}
-			}
-			if (reln.equals("aux")) {			
-				if (govA != null) {
-					govA.setModal(td.dep().originalText()); 
-				}
-			}
-			
-			if (reln.equals("neg")) {			
-				if (govA != null) {
-					govA.setNegative(true);
-				}
-			}
-			if (reln.equals("mark")) {
-				if (govA != null) {
-					govA.setMarker(td.dep().originalText());
-				}
-			}
-			if (reln.equals("advmod")) {
-				if (govA != null) {
-					govA.setClause(td.dep().originalText());
-				}
-			}
-			if (reln.equals("conj")) {
-				Action actB = model.getActionByVerbID(td.dep().index());
-				if (govA != null && actB != null) {
-					govA.addConjunction(actB);
-					actB.addConjunction(govA);
+
+			if (govA != null) {
+				switch (reln) {
+					case "nsubjpass":
+					case "dobj":
+						govA.setObject(model.getNounPhraseByIndex(td.dep().index()));
+						break;
+					case "nsubj":
+						govA.setSubject(model.getNounPhraseByIndex(td.dep().index()));
+						break;
+					case "aux":
+						govA.setModal(td.dep().originalText());
+						break;
+					case "neg":
+						govA.setNegative(true);
+						break;
+					case "mark":
+						govA.setMarker(td.dep().originalText());
+						break;
+					case "advmod":
+						String originalText = td.dep().originalText();
+						if(WordClasses.isImmediate(originalText)) {
+							govA.setImmediate(true);
+						}
+						govA.setClause(originalText);
+						break;
+					case "conj":
+						Action actB = model.getActionByVerbID(td.dep().index());
+						if (actB != null) {
+							govA.addConjunction(actB);
+							actB.addConjunction(govA);
+						}
+						break;
 				}
 			}
 		}
@@ -225,8 +220,8 @@ public class TextParser {
 				bActions.add(actB);
 				bActions.addAll(actB.getConjunctions());
 				if (actA != null) {
-					
-					for (Action aAct : aActions) {					
+
+					for (Action aAct : aActions) {
 						for (Action bAct : bActions) {
 							Interrelation rel = new Interrelation(aAct, bAct, Interrelation.RelationType.FOLLOWS);
 							if (aAct.getObject().isEmpty()) {
@@ -245,7 +240,7 @@ public class TextParser {
 	}
 	
 	private void postRelationProcessing(TextModel model) {
-		
+
 		// check if relations should be reverted
 		for (Interrelation rel : model.getInterrelations()) {
 			if (reversedCondition(rel.getActionB())) {
@@ -321,9 +316,8 @@ public class TextParser {
 			model.addAction(newAction);
 		}
 
-		if (model.getActions().size() == 1) {
-			Action verbAction = model.getActions().get(0);
-			model.getActions().remove(verbAction);
+		if (model.getActions().size() == 1 && !removedActions.isEmpty()) {
+			Action verbAction = model.getActions().remove(0);
 			for (NounPhrase np : model.getNounPhrases()) {
 				if (verbAction == null || np.getStartIndex() < verbAction.getVerbID()) {
 					model.addAction(new Action(np.toString(), np.getStartIndex()));
@@ -333,6 +327,7 @@ public class TextParser {
 				}
 			}
 		}
+
 		if (model.getActions().isEmpty()) {
 			for (NounPhrase np : model.getNounPhrases()) {
 				model.addAction(new Action(np.toString(), np.getStartIndex()));
@@ -340,8 +335,8 @@ public class TextParser {
 		}
 		
 		if (!newActions.isEmpty()) {
-			System.out.println(model.getText());
-			System.out.println(model.getActions());
+			//System.out.println(model.getText());
+			//System.out.println(model.getActions());
 			for (Interrelation rel : model.getInterrelations()) {
 				System.out.println(rel);
 			}
@@ -392,11 +387,4 @@ public class TextParser {
 		
 		return false;
 	}
-
-
-	
-
-
-
-
 }

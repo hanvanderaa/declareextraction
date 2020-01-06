@@ -10,9 +10,14 @@ import declareextraction.constructs.TextModel;
 import declareextraction.utils.WordClasses;
 
 public class DeclareConstructor {
-
-public DeclareModel convertToDeclareModel(TextModel textModel) {
+	public DeclareModel convertToDeclareModel(TextModel textModel) {
 		DeclareModel declareModel = new DeclareModel(textModel.getText());
+
+		if (textModel.getInterrelations().isEmpty() && textModel.getActions().size() == 1) {
+			DeclareConstraint constraint = transformToUnaryConstraint(textModel.getActions().get(0));
+			declareModel.addConstraint(constraint);
+			System.out.println("Constraint identified: " + constraint);
+		}
 
 		for (Interrelation rel : textModel.getInterrelations()) {
 			DeclareConstraint constraint = transformRelationToConstraint(rel);
@@ -22,6 +27,14 @@ public DeclareModel convertToDeclareModel(TextModel textModel) {
 			}
 		}
 		return declareModel;
+	}
+
+	private DeclareConstraint transformToUnaryConstraint(Action action) {
+		if (action.isNegative()) {
+			return new DeclareConstraint(ConstraintType.ABSENCE, action);
+		} else {
+			return new DeclareConstraint(ConstraintType.EXISTENCE, action);
+		}
 	}
 
 	private DeclareConstraint transformRelationToConstraint(Interrelation rel) {
@@ -67,26 +80,27 @@ public DeclareModel convertToDeclareModel(TextModel textModel) {
 		ConstraintType constraintType = null;
 		boolean aMand = WordClasses.isMandatory(rel.getActionA().getModal());
 		boolean bMand = WordClasses.isMandatory(rel.getActionB().getModal());
+		boolean bImm = rel.getActionB().isImmediate();
 		if (!bMand) {
-			constraintType = ConstraintType.PRECEDENCE;
-		} if (aMand && bMand) {
-			constraintType = ConstraintType.SUCCESSION;
-		} if (!aMand && bMand) {
-			constraintType = ConstraintType.RESPONSE;
+			constraintType = bImm ? ConstraintType.CHAINPRECEDENCE : ConstraintType.PRECEDENCE;
+		} else if (aMand) {
+			constraintType = bImm ? ConstraintType.CHAINSUCCESSION : ConstraintType.SUCCESSION;
+		} else {
+			constraintType = bImm ? ConstraintType.CHAINRESPONSE : ConstraintType.RESPONSE;
 		}
 
 		DeclareConstraint constraint = new DeclareConstraint(constraintType, rel.getActionA(), rel.getActionB());
 
 		// check if constraint should be negated
-		if (constraint.getActionA().isNegative() || constraint.getActionB().isNegative()) {
+		if (constraint.getActionB().isNegative()) {
 			constraint.setNegative();
 		}
 		return constraint;
 	}
-	
+
 	private boolean isMetaAction(Action action) {
 		String joint = action.getObject().getText() + " " + action.getSubject().getText();
-		
+
 		for (String processObject : Arrays.asList(WordClasses.PROCESS_OBJECTS)) {
 			if (joint.contains(processObject)) {
 				return true;

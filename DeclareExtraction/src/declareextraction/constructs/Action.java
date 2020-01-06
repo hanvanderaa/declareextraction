@@ -16,12 +16,13 @@ public class Action {
 	private Set<Action> conjunctions;
 	private boolean pastParticiple;
 	private boolean isNegative;
+	private boolean isImmediate;
 	private boolean isFlowAction;
 	
 	public Action(String verb, int verbID) {
 		this.verb = verb;
 		this.verbID = verbID;
-		this.conjunctions = new HashSet<Action>();
+		this.conjunctions = new HashSet<>();
 		this.pastParticiple = false;
 		this.isFlowAction = false;
 	}
@@ -130,18 +131,22 @@ public class Action {
 	public boolean isPastParticiple() {
 		return pastParticiple;
 	}
-	
-	
 
 	public boolean isNegative() {
 		return isNegative;
 	}
 
-
 	public void setNegative(boolean isNegative) {
 		this.isNegative = isNegative;
 	}
 
+	public boolean isImmediate() {
+		return isImmediate;
+	}
+
+	public void setImmediate(boolean isImmediate){
+		this.isImmediate = isImmediate;
+	}
 
 	public String actionStr() {
 		if (gstext != null) {
@@ -149,20 +154,48 @@ public class Action {
 		}
 		StringBuilder sb = new StringBuilder();
 		if (subject != null) {
-			sb.append(subject + " ");
+			sb.append(subject).append(" ");
 		}
-		if (modal != null) {
+//		if (modal != null) {
 //			sb.append(modal + " ");
-		}
+//		}
 		if (isNegative) {
 			sb.append("not ");
 		}
-		sb.append(verb + " " + object);
+
+		sb.append(verb);
+		if (object != null && !object.getText().trim().isEmpty()) {
+			sb.append(" ").append(object);
+		}
+		if (isImmediate) {
+			sb.append(" immediately");
+		}
+
+		return sb.toString().toLowerCase();
+	}
+
+	public String baseStr() {
+		//used for actionB for NOT and CHAIN relations, as those action parts are already part of the constraint type
+		if (gstext != null) {
+			return gstext;
+		}
+
+		StringBuilder sb = new StringBuilder();
+		if (subject != null) {
+			sb.append(subject).append(" ");
+		}
+
+		sb.append(verb);
+
+		if (object != null && !object.getText().trim().isEmpty()) {
+			sb.append(" ").append(object);
+		}
+
 		return sb.toString().toLowerCase();
 	}
 	
 	public String toString() {
-		return "Action: " + getSubject() + " " + actionStr();
+		return "Action: " + actionStr();
 	}
 
 
@@ -196,9 +229,7 @@ public class Action {
 				return false;
 		} else if (!verb.equals(other.verb))
 			return false;
-		if (verbID != other.verbID)
-			return false;
-		return true;
+		return verbID == other.verbID;
 	}
 
 

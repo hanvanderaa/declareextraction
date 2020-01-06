@@ -12,6 +12,7 @@ public class WordClasses {
 	public static String[] FLOW_VERBS = new String[]{"require", "need", "precede", "succeed", "follow", "occur", "happen", "take place"};
 	public static String[] REVERSE_CLAUSES = new String[]{"first", "before", "earlier"};
 	public static String[] REVERSE_MARKERS = new String[]{"after", "later"};
+	public static String[] IMMEDIATE_ADVERBS = new String[]{"immediately", "instantly", "directly", "promptly"}; //Temporal expressions expressing immediacy
 	
 	public static boolean isMandatory(String modal) {
 		return Arrays.asList(MANDATORY_MODALS).contains(modal.toLowerCase());
@@ -47,6 +48,10 @@ public class WordClasses {
 	
 	public static boolean isReverseMarker(String word) {
 		return Arrays.asList(REVERSE_MARKERS).contains(word.toLowerCase());
+	}
+
+	public static boolean isImmediate(String word) {
+		return Arrays.asList(IMMEDIATE_ADVERBS).contains(word.toLowerCase());
 	}
 	
 }
