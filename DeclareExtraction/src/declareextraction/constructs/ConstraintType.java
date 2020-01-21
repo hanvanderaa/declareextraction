@@ -2,6 +2,7 @@ package declareextraction.constructs;
 
 public enum ConstraintType {
 
+	//DeclareConstraints
 	PRECEDENCE("Precedence"),
 	/*ALTPRECEDENCE,*/
 	RESPONSE("Response"),
@@ -13,7 +14,12 @@ public enum ConstraintType {
 	END("End"),
 	/*ATMOSTONCE,*/
 	EXISTENCE("Existence"),
-	ABSENCE("Absence");
+	ABSENCE("Absence"),
+
+	//ConditionalConstraints
+	ACTIVATION("Activation"),
+	CORRELATION("Correlation"),
+	TIME("Time");
 
 	private final String constraintName;
 
