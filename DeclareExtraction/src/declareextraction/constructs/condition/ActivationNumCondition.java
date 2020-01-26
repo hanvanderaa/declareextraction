@@ -1,12 +1,13 @@
 package declareextraction.constructs.condition;
 
-public class ActivationNumConstraint extends ConditionalConstraint {
+public class ActivationNumCondition extends Condition {
 
     private String field;
     private ConditionRelation relation;
     private double value;
 
-    public ActivationNumConstraint(String field, ConditionRelation relation, double value) {
+    public ActivationNumCondition(String field, ConditionRelation relation, double value) {
+        super(ConditionType.ACTIVATION);
         this.field = field;
         this.relation = relation;
         this.value = value;
@@ -23,7 +24,7 @@ public class ActivationNumConstraint extends ConditionalConstraint {
         LOWER("<"),
         LOWER_EQUAL("<="),
         EQUALS("="),
-        /*NOT_EQUAL("!=")*/; //TODO: is this one in? what format?
+        NOT_EQUAL("!=");
 
         private String conditionSymbol;
 

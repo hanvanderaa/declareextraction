@@ -107,7 +107,7 @@ class DeclareExtractorTest {
         //is not recognized as chain constraint since the clause is not next to the verb (StanfordParsing logic); only one clause is saved per action
         //starting actionA with "immediately after" or "as soon" not possible either
         //if the clauses were saved in a list, other relations, such as ATMOSTONCE or ATLEASTONCE could also probably be easily implemented
-        String text = "if the invoice is not paid the customer does not immediately after enter";
+        String text = "if the invoice is not paid the customer does not immediately nicely enter";
         DeclareConstraint dc = getOnlyConstraintFromSentence(text);
 
         assertEquals(ConstraintType.CHAINPRECEDENCE, dc.getType());

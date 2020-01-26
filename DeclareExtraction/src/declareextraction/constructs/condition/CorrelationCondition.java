@@ -1,17 +1,18 @@
 package declareextraction.constructs.condition;
 
-public class CorrelationConstraint extends ConditionalConstraint {
+public class CorrelationCondition extends Condition {
 
     private boolean isNegative;
     private String field;
 
-    public CorrelationConstraint(boolean isNegative, String field) {
+    public CorrelationCondition(boolean isNegative, String field) {
+        super(ConditionType.CORRELATION);
         this.isNegative = isNegative;
         this.field = field;
     }
 
     @Override
     public String toRuMString() {
-        return isNegative ? "same " + field : "different " + field;
+        return isNegative ? "different " + field : "same " + field;
     }
 }

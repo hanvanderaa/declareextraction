@@ -1,12 +1,13 @@
 package declareextraction.constructs.condition;
 
-public class TimeConstraint extends ConditionalConstraint {
+public class TimeCondition extends Condition {
 
     private int minTime;
     private int maxTime;
     private TimeUnit timeUnit;
 
-    public TimeConstraint(int minTime, int maxTime, TimeUnit timeUnit) {
+    public TimeCondition(int minTime, int maxTime, TimeUnit timeUnit) {
+        super(ConditionType.TIME);
         this.minTime = minTime;
         this.maxTime = maxTime;
         this.timeUnit = timeUnit;

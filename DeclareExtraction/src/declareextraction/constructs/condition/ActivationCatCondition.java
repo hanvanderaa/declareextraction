@@ -3,13 +3,14 @@ package declareextraction.constructs.condition;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActivationCatConstraint extends ConditionalConstraint {
+public class ActivationCatCondition extends Condition {
 
     private String field;
     private boolean isNegative;
     private List<String> categories;
 
-    public ActivationCatConstraint(String field, boolean isNegative, List<String> categories) {
+    public ActivationCatCondition(String field, boolean isNegative, List<String> categories) {
+        super(ConditionType.ACTIVATION);
         this.field = field;
         this.isNegative = isNegative;
         this.categories = new ArrayList<>();
@@ -24,7 +25,6 @@ public class ActivationCatConstraint extends ConditionalConstraint {
             sb.append(isNegative ? " is not " : " is ");
             sb.append(String.join(", ", categories));
         } else {
-            //TODO: this should cover the case of 0 categories, but also throw an error in logic
             sb.append(isNegative ? " not in (" : " in (");
             sb.append(String.join(", ", categories));
             sb.append(')');
