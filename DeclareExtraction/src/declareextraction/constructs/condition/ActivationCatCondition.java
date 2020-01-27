@@ -3,7 +3,7 @@ package declareextraction.constructs.condition;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActivationCatCondition extends Condition {
+public class ActivationCatCondition extends ActivationCondition {
 
     private String field;
     private boolean isNegative;

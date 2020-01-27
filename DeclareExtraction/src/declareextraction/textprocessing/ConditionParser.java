@@ -20,7 +20,7 @@ public class ConditionParser {
         }
     }
 
-    public static Condition parseActivationCondition(String text) {
+    public static ActivationCondition parseActivationCondition(String text) {
         List<String> words = Arrays.asList(text.toLowerCase().split(" "));
         if (words.size() >= 3) {
             try {
@@ -83,28 +83,22 @@ public class ConditionParser {
         return null;
     }
 
-    public static Condition parseTimeCondition(String text) {
+    public static TimeCondition parseTimeCondition(String text) {
         List<String> words = Arrays.asList(text.toLowerCase().split(" "));
         if (words.size() == 5) {
             Double start = parseDouble(words.get(1));
             Double end = parseDouble(words.get(3));
-            if (start != null && end != null) {
-                switch (words.get(4)) {
-                    case "seconds":
-                        return new TimeCondition(start.intValue(), end.intValue(), TimeCondition.TimeUnit.SECOND);
-                    case "minutes":
-                        return new TimeCondition(start.intValue(), end.intValue(), TimeCondition.TimeUnit.MINUTE);
-                    case "hours":
-                        return new TimeCondition(start.intValue(), end.intValue(), TimeCondition.TimeUnit.HOUR);
-                    case "days":
-                        return new TimeCondition(start.intValue(), end.intValue(), TimeCondition.TimeUnit.DAY);
-                }
+            return timeConditionFromBasics(start, end, words.get(4));
+        } else if (words.size() == 4) {
+            if (words.get(0).equals("at") && words.get(1).equals("most")) {
+                Double end = parseDouble(words.get(2));
+                return timeConditionFromBasics(0D, end, words.get(3));
             }
         }
         return null;
     }
 
-    public static Condition parseCorrelationCondition(String text) {
+    public static CorrelationCondition parseCorrelationCondition(String text) {
         List<String> words = Arrays.asList(text.toLowerCase().split(" "));
         if (words.size() == 2) {
             if (words.get(0).equals("same")) {
@@ -116,7 +110,7 @@ public class ConditionParser {
         return null;
     }
 
-    private static Condition actConditionFromBasics(String field, ConditionRelation relation, String value) {
+    private static ActivationCondition actConditionFromBasics(String field, ConditionRelation relation, String value) {
         Double valueDouble = parseDouble(value);
         if (valueDouble != null) {
             return new ActivationNumCondition(field, relation, valueDouble);
@@ -124,6 +118,22 @@ public class ConditionParser {
             return new ActivationCatCondition(field, false, Collections.singletonList(value));
         } else if (relation == ConditionRelation.NOT_EQUAL) {
             return new ActivationCatCondition(field, true, Collections.singletonList(value));
+        }
+        return null;
+    }
+
+    private static TimeCondition timeConditionFromBasics(Double start, Double end, String timeUnit) {
+        if (start != null && end != null) {
+            switch (timeUnit) {
+                case "seconds":
+                    return new TimeCondition(start.intValue(), end.intValue(), TimeCondition.TimeUnit.SECOND);
+                case "minutes":
+                    return new TimeCondition(start.intValue(), end.intValue(), TimeCondition.TimeUnit.MINUTE);
+                case "hours":
+                    return new TimeCondition(start.intValue(), end.intValue(), TimeCondition.TimeUnit.HOUR);
+                case "days":
+                    return new TimeCondition(start.intValue(), end.intValue(), TimeCondition.TimeUnit.DAY);
+            }
         }
         return null;
     }

@@ -1,6 +1,6 @@
 package declareextraction.constructs.condition;
 
-public class ActivationNumCondition extends Condition {
+public class ActivationNumCondition extends ActivationCondition {
 
     private String field;
     private ConditionRelation relation;

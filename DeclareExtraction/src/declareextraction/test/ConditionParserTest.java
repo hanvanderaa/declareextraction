@@ -67,6 +67,9 @@ class ConditionParserTest {
         textToConditionRuMString.put("between 112 and 234 hours", "112,234,h");
         textToConditionRuMString.put("between 1.2 and 6.9999 days", "1,6,d");
 
+        textToConditionRuMString.put("at most eight seconds", "0,8,s");
+        textToConditionRuMString.put("at most 23 days", "0,23,d");
+
         for (Map.Entry<String, String> entry : textToConditionRuMString.entrySet()) {
             Condition c = parseCondition(entry.getKey(), Condition.ConditionType.TIME);
             assertNotNull(c, entry.getKey());

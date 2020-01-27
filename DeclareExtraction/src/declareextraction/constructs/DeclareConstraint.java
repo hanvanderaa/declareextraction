@@ -1,11 +1,18 @@
 package declareextraction.constructs;
 
+import declareextraction.constructs.condition.ActivationCondition;
+import declareextraction.constructs.condition.CorrelationCondition;
+import declareextraction.constructs.condition.TimeCondition;
+
 public class DeclareConstraint {
 
     ConstraintType type;
     Action actionA;
     Action actionB;
     boolean isNegative = false;
+    private ActivationCondition activationCondition;
+    private CorrelationCondition correlationCondition;
+    private TimeCondition timeCondition;
 
     public DeclareConstraint(ConstraintType type, Action actionA) {
         this.type = type;
@@ -54,6 +61,43 @@ public class DeclareConstraint {
         return isNegative;
     }
 
+    public ActivationCondition getActivationCondition() {
+        return activationCondition;
+    }
+
+    public void setActivationCondition(ActivationCondition activationCondition) {
+        this.activationCondition = activationCondition;
+    }
+
+    public CorrelationCondition getCorrelationCondition() {
+        return correlationCondition;
+    }
+
+    public void setCorrelationCondition(CorrelationCondition correlationCondition) {
+        this.correlationCondition = correlationCondition;
+    }
+
+    public TimeCondition getTimeCondition() {
+        return timeCondition;
+    }
+
+    public void setTimeCondition(TimeCondition timeCondition) {
+        this.timeCondition = timeCondition;
+    }
+
+    public void setToAlternate() {
+        switch (type) {
+            case PRECEDENCE:
+                this.type = ConstraintType.ALTERNATE_PRECEDENCE;
+                break;
+            case RESPONSE:
+                this.type = ConstraintType.ALTERNATE_RESPONSE;
+                break;
+            case SUCCESSION:
+                this.type = ConstraintType.ALTERNATE_SUCCESSION;
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder().append("Constraint [type=");
@@ -94,10 +138,29 @@ public class DeclareConstraint {
         }
 
         if (actionB != null) {
-            sb.append(", ").append(actionB.baseStr()).append("] | | |");
+            sb.append(", ").append(actionB.baseStr()).append("] |");
+            if (activationCondition != null) {
+                sb.append(activationCondition.toRuMString());
+            }
+            sb.append(" |");
+            if (correlationCondition != null) {
+                sb.append(correlationCondition.toRuMString());
+            }
+            sb.append(" |");
+            if (timeCondition != null) {
+                sb.append(timeCondition.toRuMString());
+            }
         } else {
-            sb.append("] | |");
+            sb.append("] |");
+            if (activationCondition != null) {
+                sb.append(activationCondition.toRuMString());
+            }
+            sb.append(" |");
+            if (timeCondition != null) {
+                sb.append(timeCondition.toRuMString());
+            }
         }
+
         return sb.toString();
     }
 

@@ -77,16 +77,16 @@ public class DeclareConstructor {
 
 	private DeclareConstraint transformToBinaryConstraint(Interrelation rel) {
 		// determine binary constraint type
-		ConstraintType constraintType = null;
+		ConstraintType constraintType;
 		boolean aMand = WordClasses.isMandatory(rel.getActionA().getModal());
 		boolean bMand = WordClasses.isMandatory(rel.getActionB().getModal());
 		boolean bImm = rel.getActionB().isImmediate();
 		if (!bMand) {
-			constraintType = bImm ? ConstraintType.CHAINPRECEDENCE : ConstraintType.PRECEDENCE;
+			constraintType = bImm ? ConstraintType.CHAIN_PRECEDENCE : ConstraintType.PRECEDENCE;
 		} else if (aMand) {
-			constraintType = bImm ? ConstraintType.CHAINSUCCESSION : ConstraintType.SUCCESSION;
+			constraintType = bImm ? ConstraintType.CHAIN_SUCCESSION : ConstraintType.SUCCESSION;
 		} else {
-			constraintType = bImm ? ConstraintType.CHAINRESPONSE : ConstraintType.RESPONSE;
+			constraintType = bImm ? ConstraintType.CHAIN_RESPONSE : ConstraintType.RESPONSE;
 		}
 
 		DeclareConstraint constraint = new DeclareConstraint(constraintType, rel.getActionA(), rel.getActionB());
@@ -101,7 +101,7 @@ public class DeclareConstructor {
 	private boolean isMetaAction(Action action) {
 		String joint = action.getObject().getText() + " " + action.getSubject().getText();
 
-		for (String processObject : Arrays.asList(WordClasses.PROCESS_OBJECTS)) {
+		for (String processObject : WordClasses.PROCESS_OBJECTS) {
 			if (joint.contains(processObject)) {
 				return true;
 			}
