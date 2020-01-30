@@ -3,12 +3,14 @@ package declareextraction.constructs;
 public enum ConstraintType {
 
 	PRECEDENCE("Precedence"),
-	/*ALTPRECEDENCE,*/
 	RESPONSE("Response"),
 	SUCCESSION("Succession"),
-	CHAINPRECEDENCE("Chain Precedence"),
-	CHAINRESPONSE("Chain Response"),
-	CHAINSUCCESSION("Chain Succession"),
+	ALTERNATE_PRECEDENCE("Alternate Precedence"),
+	ALTERNATE_RESPONSE("Alternate Response"),
+	ALTERNATE_SUCCESSION("Alternate Succession"),
+	CHAIN_PRECEDENCE("Chain Precedence"),
+	CHAIN_RESPONSE("Chain Response"),
+	CHAIN_SUCCESSION("Chain Succession"),
 	INIT("Init"),
 	END("End"),
 	/*ATMOSTONCE,*/
