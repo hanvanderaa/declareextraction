@@ -60,7 +60,7 @@ public class TextParser {
 	
 	
 	public TextModel parseConstraintString(String s) {
-		
+		s = preprocessText(s);
 		TextModel model = new TextModel(s);
 		extractNounPhrases(model);
 		extractActivities(model);
@@ -71,6 +71,14 @@ public class TextParser {
 		return model;
 	}
 
+	private String preprocessText(String s) {
+		// this is for Speech2RuM since you cannot "speak" a comma, which is needed for proper parsing
+		if (s.contains(" then") && !s.contains(", then")) {
+			s = s.replace(" then", ", then");
+		}
+		return s;
+	}
+
 	private void extractNounPhrases(TextModel model) {
 		Annotation sfparse = new Annotation(model.getText());
 		this.pipeline.annotate(sfparse);
@@ -79,16 +87,19 @@ public class TextParser {
 
 		List<CoreLabel> rawWords2 = tok.tokenize();
 		Tree parse = lp.apply(rawWords2);
-		
 
 		for (Tree tree : parse) {
-			if (tree.label().toString().equals("NP")) {
+			if (tree.size()  < parse.size() - 2 && tree.label().toString().equals("NP")) {
 				StringBuilder sb = new StringBuilder();
 				for (Tree leaf : tree.getLeaves()) {
-					sb.append(leaf.label().toString() + " ");
+					if (!WordClasses.isReservedWord(leaf.label().toString().toLowerCase())) {
+						sb.append(leaf.label().toString() + " ");
+					}
 				}
 				int startIndex = Collections.indexOfSubList(parse.getLeaves(), tree.getLeaves());
-				NounPhrase np = new NounPhrase(sb.toString().trim(), startIndex + 1, startIndex + tree.getLeaves().size());
+				int endIndex = startIndex + tree.getLeaves().size();
+
+				NounPhrase np = new NounPhrase(sb.toString().trim(), startIndex + 1, endIndex);
 				
 				if (!isPartOfLargerNP(np, model.getNounPhrases())) {
 					model.addNounPhrase(np);
@@ -327,7 +338,17 @@ public class TextParser {
 			Action verbAction = model.getActions().remove(0);
 			for (NounPhrase np : model.getNounPhrases()) {
 				if (verbAction == null || np.getStartIndex() < verbAction.getVerbID()) {
-					model.addAction(new Action(np.toString(), np.getStartIndex()));
+					Action act = new Action(np.toString(), np.getStartIndex());
+					for (Action removedAct : removedActions) {
+						if (!removedAct.getModal().isEmpty()) {
+							for (Action existingAct : model.getActions()) {
+								if (existingAct.getModal().isEmpty()) {
+									act.setModal(removedAct.getModal());
+								}
+							}
+ 						}
+					}
+					model.addAction(act);
 				} else {
 					model.addAction(verbAction);
 					verbAction = null;

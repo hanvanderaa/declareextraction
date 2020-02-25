@@ -13,7 +13,9 @@ public class WordClasses {
 	public static String[] REVERSE_CLAUSES = new String[]{"first", "before", "earlier"};
 	public static String[] REVERSE_MARKERS = new String[]{"after", "later"};
 	public static String[] IMMEDIATE_ADVERBS = new String[]{"immediately", "instantly", "directly", "promptly"}; //Temporal expressions expressing immediacy
-	
+	public static String[] RESERVED_WORDS = new String[]{"then", "after", "later"};
+
+
 	public static boolean isMandatory(String modal) {
 		return Arrays.asList(MANDATORY_MODALS).contains(modal.toLowerCase());
 	}
@@ -44,6 +46,10 @@ public class WordClasses {
 	
 	public static boolean isReverseClause(String word) {
 		return Arrays.asList(REVERSE_CLAUSES).contains(word.toLowerCase());
+	}
+
+	public static boolean isReservedWord(String word) {
+		return Arrays.asList(RESERVED_WORDS).contains(word.toLowerCase());
 	}
 	
 	public static boolean isReverseMarker(String word) {

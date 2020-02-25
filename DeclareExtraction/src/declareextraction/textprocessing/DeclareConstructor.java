@@ -81,14 +81,14 @@ public class DeclareConstructor {
 		boolean aMand = WordClasses.isMandatory(rel.getActionA().getModal());
 		boolean bMand = WordClasses.isMandatory(rel.getActionB().getModal());
 		boolean bImm = rel.getActionB().isImmediate();
-		if (!bMand) {
+		if (!aMand && !bMand) {
 			constraintType = bImm ? ConstraintType.CHAIN_PRECEDENCE : ConstraintType.PRECEDENCE;
 		} else if (aMand) {
 			constraintType = bImm ? ConstraintType.CHAIN_SUCCESSION : ConstraintType.SUCCESSION;
 		} else {
 			constraintType = bImm ? ConstraintType.CHAIN_RESPONSE : ConstraintType.RESPONSE;
 		}
-
+		resolveAnaphoras(rel.getActionA(), rel.getActionB());
 		DeclareConstraint constraint = new DeclareConstraint(constraintType, rel.getActionA(), rel.getActionB());
 
 		// check if constraint should be negated
@@ -96,6 +96,16 @@ public class DeclareConstructor {
 			constraint.setNegative();
 		}
 		return constraint;
+	}
+
+	private void resolveAnaphoras(Action actA, Action actB) {
+		// TODO: this is only very basic
+		if (actA.getObject().getText().equals("it") && !actB.getObject().getText().isEmpty()) {
+			actA.setObject(actB.getObject());
+		}
+		if (actB.getObject().getText().equals("it") && !actA.getObject().getText().isEmpty()) {
+			actB.setObject(actA.getObject());
+		}
 	}
 
 	private boolean isMetaAction(Action action) {

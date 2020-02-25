@@ -2,6 +2,7 @@ package declareextraction.main;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import declareextraction.constructs.Action;
@@ -39,8 +40,23 @@ public class DeclareExtractor {
 //			t.runApproachOnCSVFile(CONSTRAINT_FILE);
 //		}
 //		else {
-			String test = "Door closure should be preceded by door opening";
-			t.runSingleConstraint(test);
+			String test = "A claim must be created before it is approved";
+			String[] input = new String[]{
+//					"A claim must be created before it is approved",
+//		"If a claim is approved then it must have been created first",
+//					"If an order is sent then an order must be received",
+//		"Open order must be followed by close order",
+//		"Switch on light must be preceded by switch off light",
+//					"Switching on the light must be preceded by switching off the light",
+
+//		"Close door must eventually be followed by open door",
+		"A meeting must first be arranged and it shall be held afterwards",
+					"A meeting must first be arranged and it shall be held after",
+		};
+			for (int i = 0; i < input.length; i++) {
+				t.runSingleConstraint(input[i]);
+				System.out.println("\n");
+			}
 //		}
 	}
 	
