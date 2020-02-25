@@ -31,6 +31,13 @@ public class Interrelation {
 		return type;
 	}
 
+	public void swapActions() {
+		Action swap = this.actionA;
+		this.actionA = this.actionB;
+		this.actionB = swap;
+		int i = 5;
+	}
+
 	@Override
 	public String toString() {
 		return "Interrelation [A=" + actionA + ", B=" + actionB + ", type=" + type + "]";

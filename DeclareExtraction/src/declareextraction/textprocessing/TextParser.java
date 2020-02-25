@@ -128,6 +128,9 @@ public class TextParser {
 						if (WordClasses.isFlowVerb(lemma)) {
 							action.setToFlowAction();
 						}
+						if (pos.equals("VBN")) {
+							action.setPastParticiple(true);
+						}
 						model.addAction(action);
 					}
 				}
@@ -243,11 +246,8 @@ public class TextParser {
 
 		// check if relations should be reverted
 		for (Interrelation rel : model.getInterrelations()) {
-			if (reversedCondition(rel.getActionB())) {
-				Action currA = rel.getActionA();
-				Action currB = rel.getActionB();
-				rel.setActionA(currB);
-				rel.setActionB(currA);
+			if (reversedCondition(rel.getActionA(), rel.getActionB())) {
+				rel.swapActions();
 			}
 		}
 				
@@ -261,6 +261,9 @@ public class TextParser {
 					mergeIncompleteActions(actA, neighbor);
 				}
 				Interrelation rel = new Interrelation(actA, actB, Interrelation.RelationType.FOLLOWS);
+				if (reversedCondition(rel.getActionA(), rel.getActionB())) {
+					rel.swapActions();
+				}
 				model.addInterrelation(rel);
 			}
 		}
@@ -278,9 +281,13 @@ public class TextParser {
 			if (action.isFlowAction()) {
 				String clause = "";
 				//TODO: this is actually part of a more generic word class
-				if (action.getVerb().startsWith("preced")) {
+				if (action.getVerb().startsWith("preced") && !action.isPastParticiple()) {
 					clause = "first";
 				}
+				if (action.getVerb().startsWith("preced") && action.isPastParticiple()) {
+					clause = "later";
+				}
+//				TODO: handle these two cases more generically
 				if (!action.getSubject().isEmpty()) {
 					Action subAct = new Action(action.getSubject().toString(), -1);
 					subAct.setClause(clause);
@@ -376,7 +383,11 @@ public class TextParser {
 		return closest;
 	}
 	
-	private boolean reversedCondition(Action actB) {
+	private boolean reversedCondition(Action actA, Action actB) {
+		// check for reverse order indicators on action A, e.g. "must be created first"
+		if (actA.hasClause() && WordClasses.isReverseMarker(actA.getClause())) {
+			return true;
+		}
 		// check for reverse order indicators, e.g. "must be created first"
 		if (actB.hasClause() && WordClasses.isReverseClause(actB.getClause())) {
 			return true;

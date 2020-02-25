@@ -35,12 +35,13 @@ public class DeclareExtractor {
 
 	public static void main(String[] args) {
 		DeclareExtractor t = new DeclareExtractor();
-		if (args.length == 0) {
-			t.runApproachOnCSVFile(CONSTRAINT_FILE);
-		}
-		else {
-			t.runSingleConstraint(args[0]);
-		}
+//		if (args.length == 0) {
+//			t.runApproachOnCSVFile(CONSTRAINT_FILE);
+//		}
+//		else {
+			String test = "Door closure should be preceded by door opening";
+			t.runSingleConstraint(test);
+//		}
 	}
 	
 	
@@ -62,7 +63,7 @@ public class DeclareExtractor {
 		}
 		
 		DeclareModel dm = declareConstructor.convertToDeclareModel(textModel);
-		dm.addTextModel(textModel);
+			dm.addTextModel(textModel);
 	}
 	
 	
