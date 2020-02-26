@@ -14,6 +14,7 @@ public class WordClasses {
 	public static String[] REVERSE_MARKERS = new String[]{"after", "later"};
 	public static String[] IMMEDIATE_ADVERBS = new String[]{"immediately", "instantly", "directly", "promptly"}; //Temporal expressions expressing immediacy
 	public static String[] RESERVED_WORDS = new String[]{"then", "after", "later"};
+	public static String[] EXECUTION_LIMITS = new String[]{"at most once", "not more than once", "one time"};
 
 
 	public static boolean isMandatory(String modal) {
@@ -59,5 +60,13 @@ public class WordClasses {
 	public static boolean isImmediate(String word) {
 		return Arrays.asList(IMMEDIATE_ADVERBS).contains(word.toLowerCase());
 	}
-	
+
+    public static boolean hasExecutionLimit(String text) {
+		for (String term : EXECUTION_LIMITS) {
+			if (text.toLowerCase().contains(term)) {
+				return true;
+			}
+		}
+		return false;
+    }
 }

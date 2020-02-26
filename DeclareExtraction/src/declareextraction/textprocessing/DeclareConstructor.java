@@ -14,7 +14,7 @@ public class DeclareConstructor {
 		DeclareModel declareModel = new DeclareModel(textModel.getText());
 
 		if (textModel.getInterrelations().isEmpty() && textModel.getActions().size() == 1) {
-			DeclareConstraint constraint = transformToUnaryConstraint(textModel.getActions().get(0));
+			DeclareConstraint constraint = transformToUnaryConstraint(textModel, textModel.getActions().get(0));
 			declareModel.addConstraint(constraint);
 			System.out.println("Constraint identified: " + constraint);
 		}
@@ -29,7 +29,10 @@ public class DeclareConstructor {
 		return declareModel;
 	}
 
-	private DeclareConstraint transformToUnaryConstraint(Action action) {
+	private DeclareConstraint transformToUnaryConstraint(TextModel textModel, Action action) {
+		if (WordClasses.hasExecutionLimit(textModel.getText())) {
+			return new DeclareConstraint(ConstraintType.ATMOSTONCE, action);
+		}
 		if (action.isNegative()) {
 			return new DeclareConstraint(ConstraintType.ABSENCE, action);
 		} else {

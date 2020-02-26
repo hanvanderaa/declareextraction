@@ -13,7 +13,7 @@ public enum ConstraintType {
 	CHAIN_SUCCESSION("Chain Succession"),
 	INIT("Init"),
 	END("End"),
-	/*ATMOSTONCE,*/
+	ATMOSTONCE("At most once"),
 	EXISTENCE("Existence"),
 	ABSENCE("Absence");
 
