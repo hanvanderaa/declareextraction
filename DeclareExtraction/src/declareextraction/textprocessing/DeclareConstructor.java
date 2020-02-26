@@ -1,6 +1,8 @@
 package declareextraction.textprocessing;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import declareextraction.constructs.Action;
 import declareextraction.constructs.ConstraintType;
@@ -14,9 +16,17 @@ public class DeclareConstructor {
 		DeclareModel declareModel = new DeclareModel(textModel.getText());
 
 		if (textModel.getInterrelations().isEmpty() && textModel.getActions().size() == 1) {
-			DeclareConstraint constraint = transformToUnaryConstraint(textModel, textModel.getActions().get(0));
-			declareModel.addConstraint(constraint);
-			System.out.println("Constraint identified: " + constraint);
+			Action action = textModel.getActions().get(0);
+			if (action.getVerb().contains("and") && WordClasses.hasCoOccurrence(textModel.getText())) {
+				for (DeclareConstraint constraint : transformToCoexistenceConstraint(textModel, textModel.getActions().get(0))) {
+					declareModel.addConstraint(constraint);
+					System.out.println("Constraint identified: " + constraint);
+				}
+			} else {
+				DeclareConstraint constraint = transformToUnaryConstraint(textModel, textModel.getActions().get(0));
+				declareModel.addConstraint(constraint);
+				System.out.println("Constraint identified: " + constraint);
+			}
 		}
 
 		for (Interrelation rel : textModel.getInterrelations()) {
@@ -41,6 +51,22 @@ public class DeclareConstructor {
 		} else {
 			return new DeclareConstraint(ConstraintType.EXISTENCE, action);
 		}
+	}
+
+	private List<DeclareConstraint> transformToCoexistenceConstraint(TextModel textModel, Action action) {
+		String[] verbs = action.getVerb().split("and");
+		List<Action> actions = new ArrayList<>();
+		for (String verb : verbs) {
+				Action newAct = new Action(verb.trim().toLowerCase());
+				newAct.setObject(action.getObject());
+				actions.add(newAct);
+		}
+		List<DeclareConstraint> constraints = new ArrayList<>();
+		for (int i = 0; i < actions.size() - 1; i++) {
+			DeclareConstraint constraint = new DeclareConstraint(ConstraintType.COEXISTENCE, actions.get(i), actions.get(i+1));
+			constraints.add(constraint);
+		}
+		return constraints;
 	}
 
 	private DeclareConstraint transformRelationToConstraint(Interrelation rel) {

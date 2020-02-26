@@ -13,9 +13,9 @@ public class WordClasses {
 	public static String[] REVERSE_CLAUSES = new String[]{"first", "before", "earlier"};
 	public static String[] REVERSE_MARKERS = new String[]{"after", "later"};
 	public static String[] IMMEDIATE_ADVERBS = new String[]{"immediately", "instantly", "directly", "promptly"}; //Temporal expressions expressing immediacy
-	public static String[] RESERVED_WORDS = new String[]{"then", "after", "later"};
+	public static String[] AFTER_INDICATORS = new String[]{"then", "after", "later"};
 	public static String[] EXECUTION_LIMITS = new String[]{"only once", "at most once", "not more than once", "one time", "fewer than twice", "less than twice"};
-
+	public static String[] CO_OCCURRENCE = new String[]{"together", "co-occur", "co occur", "co-exist", "co exist" };
 
 	public static boolean isMandatory(String modal) {
 		return Arrays.asList(MANDATORY_MODALS).contains(modal.toLowerCase());
@@ -50,7 +50,7 @@ public class WordClasses {
 	}
 
 	public static boolean isReservedWord(String word) {
-		return Arrays.asList(RESERVED_WORDS).contains(word.toLowerCase());
+		return Arrays.asList(AFTER_INDICATORS).contains(word.toLowerCase());
 	}
 	
 	public static boolean isReverseMarker(String word) {
@@ -59,6 +59,15 @@ public class WordClasses {
 
 	public static boolean isImmediate(String word) {
 		return Arrays.asList(IMMEDIATE_ADVERBS).contains(word.toLowerCase());
+	}
+
+	public static boolean hasCoOccurrence(String text) {
+		for (String term : CO_OCCURRENCE) {
+			if (text.toLowerCase().contains(term) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
     public static boolean hasExecutionLimit(String text) {
