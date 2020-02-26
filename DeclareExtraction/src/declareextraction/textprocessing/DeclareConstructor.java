@@ -31,6 +31,9 @@ public class DeclareConstructor {
 
 	private DeclareConstraint transformToUnaryConstraint(TextModel textModel, Action action) {
 		if (WordClasses.hasExecutionLimit(textModel.getText())) {
+			if (action.isNegative()) {
+				action.setNegative(false);
+			}
 			return new DeclareConstraint(ConstraintType.ATMOSTONCE, action);
 		}
 		if (action.isNegative()) {

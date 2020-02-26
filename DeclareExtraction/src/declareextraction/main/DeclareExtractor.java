@@ -50,7 +50,7 @@ public class DeclareExtractor {
 //					"Switching on the light must be preceded by switching off the light",
 
 //		"Close door must eventually be followed by open door",
-		"An order should be created at most once",
+		"An order should not be created more than once",
 //					"A meeting must first be arranged and it shall be held after",
 		};
 			for (int i = 0; i < input.length; i++) {
