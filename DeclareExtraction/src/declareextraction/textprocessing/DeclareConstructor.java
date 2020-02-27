@@ -113,7 +113,7 @@ public class DeclareConstructor {
 		boolean aMand = WordClasses.isMandatory(rel.getActionA().getModal());
 		boolean bMand = WordClasses.isMandatory(rel.getActionB().getModal());
 		boolean bImm = rel.getActionB().isImmediate();
-		if (!aMand && !bMand) {
+		if (!bMand) {
 			constraintType = bImm ? ConstraintType.CHAIN_PRECEDENCE : ConstraintType.PRECEDENCE;
 		} else if (aMand) {
 			constraintType = bImm ? ConstraintType.CHAIN_SUCCESSION : ConstraintType.SUCCESSION;

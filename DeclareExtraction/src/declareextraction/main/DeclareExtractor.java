@@ -51,7 +51,7 @@ public class DeclareExtractor {
 
 //		"Close door must eventually be followed by open door",
 //		"Opening and closing should occur together",
-					"order shipping and invoice payment should occur together"
+					"A meeting must first be arranged and it shall be held after"
 //					"A meeting must first be arranged and it shall be held after",
 		};
 			for (int i = 0; i < input.length; i++) {
