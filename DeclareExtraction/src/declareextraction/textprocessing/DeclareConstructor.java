@@ -30,7 +30,7 @@ public class DeclareConstructor {
 		}
 
 		for (Interrelation rel : textModel.getInterrelations()) {
-			DeclareConstraint constraint = transformRelationToConstraint(rel);
+			DeclareConstraint constraint = transformRelationToConstraint(textModel, rel);
 			if (constraint != null) {
 				declareModel.addConstraint(constraint);
 				System.out.println("Constraint identified: " + constraint);
@@ -69,7 +69,7 @@ public class DeclareConstructor {
 		return constraints;
 	}
 
-	private DeclareConstraint transformRelationToConstraint(Interrelation rel) {
+	private DeclareConstraint transformRelationToConstraint(TextModel textModel, Interrelation rel) {
 		// transform into meta constraint (init/end)
 		if (isMetaAction(rel.getActionA()) || isMetaAction(rel.getActionB())) {
 			return transformToMetaConstraint(rel);
@@ -77,7 +77,7 @@ public class DeclareConstructor {
 
 		// transform into binary constraint (response/precedence/succession)
 		if (rel.getType() == Interrelation.RelationType.FOLLOWS) {
-			return transformToBinaryConstraint(rel);
+			return transformToBinaryConstraint(textModel, rel);
 		}
 		return null;
 	}
@@ -107,18 +107,23 @@ public class DeclareConstructor {
 		return null;
 	}
 
-	private DeclareConstraint transformToBinaryConstraint(Interrelation rel) {
+	private DeclareConstraint transformToBinaryConstraint(TextModel textModel, Interrelation rel) {
 		// determine binary constraint type
 		ConstraintType constraintType;
 		boolean aMand = WordClasses.isMandatory(rel.getActionA().getModal());
 		boolean bMand = WordClasses.isMandatory(rel.getActionB().getModal());
 		boolean bImm = rel.getActionB().isImmediate();
+
 		if (!bMand) {
 			constraintType = bImm ? ConstraintType.CHAIN_PRECEDENCE : ConstraintType.PRECEDENCE;
 		} else if (aMand) {
 			constraintType = bImm ? ConstraintType.CHAIN_SUCCESSION : ConstraintType.SUCCESSION;
 		} else {
-			constraintType = bImm ? ConstraintType.CHAIN_RESPONSE : ConstraintType.RESPONSE;
+			if (WordClasses.hasOrderIndicator(textModel.getText())) {
+				constraintType = bImm ? ConstraintType.CHAIN_RESPONSE : ConstraintType.RESPONSE;
+			} else {
+				constraintType = ConstraintType.RESPONDED_EXISTENCE;
+			}
 		}
 		resolveAnaphoras(rel.getActionA(), rel.getActionB());
 		DeclareConstraint constraint = new DeclareConstraint(constraintType, rel.getActionA(), rel.getActionB());
@@ -129,6 +134,8 @@ public class DeclareConstructor {
 		}
 		return constraint;
 	}
+
+
 
 	private void resolveAnaphoras(Action actA, Action actB) {
 		// TODO: this is only very basic

@@ -16,6 +16,7 @@ public enum ConstraintType {
 	ATMOSTONCE("At most once"),
 	EXISTENCE("Existence"),
 	COEXISTENCE("Co-existence"),
+	RESPONDED_EXISTENCE("Responded existence"),
 	ABSENCE("Absence");
 
 	private final String constraintName;
