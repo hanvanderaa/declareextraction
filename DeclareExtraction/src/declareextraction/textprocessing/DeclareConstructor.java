@@ -129,7 +129,9 @@ public class DeclareConstructor {
 		boolean negative = false;
 		if (rel.getActionA().isNegative() || rel.getActionB().isNegative()) {
 			negative = true;
-			if (!WordClasses.hasOrderIndicator(textModel.getText())) {
+			if (WordClasses.hasOrderIndicator(textModel.getText())) {
+				constraintType = ConstraintType.SUCCESSION;
+			} else {
 				constraintType = ConstraintType.COEXISTENCE;
 			}
 		}
