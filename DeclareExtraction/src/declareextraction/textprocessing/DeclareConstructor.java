@@ -127,7 +127,7 @@ public class DeclareConstructor {
 		}
 		resolveAnaphoras(rel.getActionA(), rel.getActionB());
 		boolean negative = false;
-		if (rel.getActionA().isNegative() || rel.getActionB().isNegative()) {
+		if (rel.getActionB().isNegative()) {
 			negative = true;
 			if (WordClasses.hasOrderIndicator(textModel.getText())) {
 				constraintType = ConstraintType.SUCCESSION;
