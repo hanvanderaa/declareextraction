@@ -13,10 +13,10 @@ public enum ConstraintType {
 	CHAIN_SUCCESSION("Chain Succession"),
 	INIT("Init"),
 	END("End"),
-	ATMOSTONCE("At most once"),
+	ATMOSTONCE("Absence2"),
 	EXISTENCE("Existence"),
-	COEXISTENCE("Co-existence"),
-	RESPONDED_EXISTENCE("Responded existence"),
+	COEXISTENCE("Co-Existence"),
+	RESPONDED_EXISTENCE("Responded Existence"),
 	ABSENCE("Absence");
 
 	private final String constraintName;

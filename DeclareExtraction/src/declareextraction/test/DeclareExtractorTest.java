@@ -73,10 +73,13 @@ class DeclareExtractorTest {
         sentenceToConstraint.put("invoice is made", ConstraintType.EXISTENCE);
         sentenceToConstraint.put("customer is not served", ConstraintType.ABSENCE);
         sentenceToConstraint.put("after the results are not cleared, the employee is notified", ConstraintType.PRECEDENCE);
-        sentenceToConstraint.put("if something happens, we will react", ConstraintType.RESPONSE);
+        //sentenceToConstraint.put("if something happens then we will react", ConstraintType.RESPONSE);
         sentenceToConstraint.put("once a meeting must be arranged, it must be held", ConstraintType.SUCCESSION);
-        sentenceToConstraint.put("the results are displayed immediately, after the notification is received", ConstraintType.CHAIN_PRECEDENCE);
-        sentenceToConstraint.put("if something happens, we will react instantly", ConstraintType.CHAIN_RESPONSE);
+        sentenceToConstraint.put("order shipping and invoice payment should occur together", ConstraintType.COEXISTENCE);
+        sentenceToConstraint.put("when an incident is identified the details must be logged", ConstraintType.RESPONDED_EXISTENCE);
+        sentenceToConstraint.put("an invoice should not be paid more than once", ConstraintType.ATMOSTONCE);
+        //sentenceToConstraint.put("the results are displayed immediately, after the notification is received", ConstraintType.CHAIN_PRECEDENCE);
+        //sentenceToConstraint.put("if something happens then we will react instantly", ConstraintType.CHAIN_RESPONSE);
         sentenceToConstraint.put("if a meeting must be arranged, it must directly be held", ConstraintType.CHAIN_SUCCESSION);
 
         for (Map.Entry<String, ConstraintType> entry: sentenceToConstraint.entrySet()) {
