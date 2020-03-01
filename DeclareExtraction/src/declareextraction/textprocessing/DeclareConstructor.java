@@ -126,10 +126,15 @@ public class DeclareConstructor {
 			}
 		}
 		resolveAnaphoras(rel.getActionA(), rel.getActionB());
+		boolean negative = false;
+		if (rel.getActionA().isNegative() || rel.getActionB().isNegative()) {
+			negative = true;
+			if (!WordClasses.hasOrderIndicator(textModel.getText())) {
+				constraintType = ConstraintType.COEXISTENCE;
+			}
+		}
 		DeclareConstraint constraint = new DeclareConstraint(constraintType, rel.getActionA(), rel.getActionB());
-
-		// check if constraint should be negated
-		if (constraint.getActionB().isNegative()) {
+		if (negative) {
 			constraint.setNegative();
 		}
 		return constraint;

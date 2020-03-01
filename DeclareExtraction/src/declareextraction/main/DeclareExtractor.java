@@ -51,9 +51,8 @@ public class DeclareExtractor {
 
 //		"Close door must eventually be followed by open door",
 //		"Opening and closing should occur together",
-					"When an order is shipped, an invoice must be sent",
-					"When an order is shipped, an invoice must be sent after"
-//					"A meeting must first be arranged and it shall be held after",
+					"If an application is rejected, it cannot be accepted",
+					"If an application is rejected, it must not be accepted",
 		};
 			for (int i = 0; i < input.length; i++) {
 				t.runSingleConstraint(input[i]);
