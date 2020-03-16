@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+//TODO: Test broken after logic changes
 class DeclareExtractorTest {
     private static TextParser textParser;
     private static DeclareConstructor declareConstructor;

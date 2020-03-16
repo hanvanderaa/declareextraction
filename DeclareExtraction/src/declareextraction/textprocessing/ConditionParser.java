@@ -4,110 +4,145 @@ import declareextraction.constructs.condition.*;
 import declareextraction.constructs.condition.ActivationNumCondition.ConditionRelation;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ConditionParser {
 
-    public static Condition parseCondition(String text, Condition.ConditionType type) {
+    private final static String andOrSeparator = "((?<=( (and|or) (?!equal to)))|(?=( (and|or) (?!equal to))))";
+    private final static Pattern activatCat = Pattern.compile("^(.+?)( is(?: not)?(?: in| equal to)?|(?: not)?(?: in) )(.+)$");
+    private final static Pattern activatNum = Pattern.compile("^(.+?)( (?:is )?(?:(greater|higher|more|smaller|lower|less) )than (?:or equal to )?)(.+)$");
+    private final static Pattern timePattern1 = Pattern.compile("^(?:between (.*) and|in|no later than|at most) (.*) (days|hours|minutes|seconds)$");
+    private final static Pattern timePattern2 = Pattern.compile("^(?:(?:not before|no earlier than) (.+?)(?: )?(days|hours|minutes|seconds)?) and (?:(?:within|not after|no later than) (.+?)(?: )?(days|hours|minutes|seconds)?)$");
+    private final static Pattern corrPattern = Pattern.compile("^(.*) is (same|different)$");
+
+    public static String parseCondition(String text, Condition.ConditionType type) {
         switch (type) {
             case ACTIVATION:
-                return parseActivationCondition(text);
+                return parseActivationConditions(text);
             case CORRELATION:
-                return parseCorrelationCondition(text);
+                return parseActivationOrCorrelationConditions(text);
             case TIME:
-                return parseTimeCondition(text);
+                Condition c = parseTimeCondition(text);
+                return c == null ? null : c.toRuMString();
             default:
                 return null;
         }
     }
 
-    public static ActivationCondition parseActivationCondition(String text) {
-        List<String> words = Arrays.asList(text.toLowerCase().split(" "));
-        if (words.size() >= 3) {
-            try {
-                Iterator<String> iter = words.iterator();
-                String field = iter.next();
-                String next = iter.next();
-
-                switch (next) {
-                    case "not":
-                        if (!iter.next().equals("in")) {
-                            break;
-                        }
-                    case "in":
-                        boolean falseCond = next.equals("not");
-                        List<String> cats = new ArrayList<>();
-                        iter.forEachRemaining(cats::add);
-                        return new ActivationCatCondition(field, falseCond, cats);
-                    case "is":
-                        next = iter.next();
-                        if (next.equals("not")) {
-                            return actConditionFromBasics(field, ConditionRelation.NOT_EQUAL, iter.next());
-                        } else {
-                            return actConditionFromBasics(field, ConditionRelation.EQUALS, next);
-                        }
-                    case "higher":
-                    case "greater":
-                    case "more": {
-                        if (iter.next().equals("than")) {
-                            next = iter.next();
-                            if (next.equals("or")) {
-                                if (iter.next().equals("equal") && iter.next().equals("to")) {
-                                    return actConditionFromBasics(field, ConditionRelation.GREATER_EQUAL, iter.next());
-                                }
-                            } else {
-                                return actConditionFromBasics(field, ConditionRelation.GREATER, next);
-                            }
-                        }
-                        break;
-                    }
-                    case "lower":
-                    case "less":
-                    case "smaller": {
-                        if (iter.next().equals("than")) {
-                            next = iter.next();
-                            if (next.equals("or")) {
-                                if (iter.next().equals("equal") && iter.next().equals("to")) {
-                                    return actConditionFromBasics(field, ConditionRelation.LOWER_EQUAL, iter.next());
-                                }
-                            } else {
-                                return actConditionFromBasics(field, ConditionRelation.LOWER, next);
-                            }
-                        }
-                        break;
-                    }
-                }
-            } catch (NoSuchElementException ignored) {
+    public static String parseActivationConditions(String text) {
+        List<String> conditions = Arrays.asList(text.toLowerCase().split(andOrSeparator));
+        Iterator<String> iter = conditions.iterator();
+        StringBuilder result = new StringBuilder();
+        while (iter.hasNext()) {
+            String next = iter.next();
+            if (next.equals(" and ") || next.equals(" or ")) {
+                result.append(next);
+                continue;
             }
+
+            Condition c = parseActivationCondition(next);
+            if (c != null) {
+                result.append(c.toRuMString());
+            }
+        }
+
+        if (result.length() > 0) {
+            return result.toString();
+        }
+
+        return null;
+    }
+
+    public static ActivationCondition parseActivationCondition(String text) {
+        Matcher m;
+        if ((m = activatNum.matcher(text)).find()) {
+            String field = String.join("_", m.group(1).split("\\s+"));
+            boolean orEquals = m.group(2).contains("equal");
+            boolean greater = m.group(3).equals("greater") || m.group(3).equals("higher") || m.group(3).equals("more");
+
+            ConditionRelation rel;
+            if (greater) {
+                rel = orEquals ? ConditionRelation.GREATER_EQUAL : ConditionRelation.GREATER;
+            } else {
+                rel = orEquals ? ConditionRelation.LOWER_EQUAL : ConditionRelation.LOWER;
+            }
+            return actConditionFromBasics(field, rel, m.group(4).trim());
+        } else if ((m = activatCat.matcher(text)).find()) {
+            String field = String.join("_", m.group(1).split("\\s+"));
+            boolean falseCond = m.group(2).contains("not");
+
+            if (m.group(2).contains("in")) {
+                return new ActivationCatCondition(field, falseCond, Arrays.asList(m.group(3).trim().split("\\s+")));
+            } else {
+                return actConditionFromBasics(field, falseCond ? ConditionRelation.NOT_EQUAL : ConditionRelation.EQUALS, m.group(3).trim());
+            }
+
         }
 
         return null;
     }
 
     public static TimeCondition parseTimeCondition(String text) {
-        List<String> words = Arrays.asList(text.toLowerCase().split(" "));
-        if (words.size() == 5) {
-            Double start = parseDouble(words.get(1));
-            Double end = parseDouble(words.get(3));
-            return timeConditionFromBasics(start, end, words.get(4));
-        } else if (words.size() == 4) {
-            if (words.get(0).equals("at") && words.get(1).equals("most")) {
-                Double end = parseDouble(words.get(2));
-                return timeConditionFromBasics(0D, end, words.get(3));
+        Matcher m;
+        if ((m = timePattern1.matcher(text)).find()) {
+            Double start = m.group(1) == null ? 0D : parseDouble(m.group(1));
+            Double end = parseDouble(m.group(2));
+            return timeConditionFromBasics(start, end, m.group(3));
+        } else if ((m = timePattern2.matcher(text)).find()) {
+            Double start = parseDouble(m.group(1));
+            Double end = parseDouble(m.group(3));
+            if (m.group(2) != null) {
+                return timeConditionFromBasics(start, end, m.group(2));
+            } else if (m.groupCount() > 3) {
+                return timeConditionFromBasics(start, end, m.group(4));
             }
         }
+
         return null;
     }
 
     public static CorrelationCondition parseCorrelationCondition(String text) {
-        List<String> words = Arrays.asList(text.toLowerCase().split(" "));
-        if (words.size() == 2) {
-            if (words.get(0).equals("same")) {
-                return new CorrelationCondition(false, words.get(1));
-            } else if (words.get(0).equals("different")) {
-                return new CorrelationCondition(true, words.get(1));
+        Matcher m;
+        if ((m = corrPattern.matcher(text)).find()) {
+            String field = String.join("_", m.group(1).split("\\s+"));
+            if (m.group(2).equals("same")) {
+                return new CorrelationCondition(false, field);
+            } else {
+                return new CorrelationCondition(true, field);
             }
         }
+
         return null;
+    }
+
+    public static String parseActivationOrCorrelationConditions(String text) {
+        List<String> conditions = Arrays.asList(text.toLowerCase().split(andOrSeparator));
+        Iterator<String> iter = conditions.iterator();
+        StringBuilder result = new StringBuilder();
+        while (iter.hasNext()) {
+            String next = iter.next();
+            if (next.equals(" and ") || next.equals(" or ")) {
+                result.append(next);
+                continue;
+            }
+
+            Condition c = activationOrCorrelation(next);
+            if (c != null) {
+                result.append(c.toRuMString());
+            }
+        }
+
+        if (result.length() > 0) {
+            return result.toString();
+        }
+
+        return null;
+    }
+
+    public static Condition activationOrCorrelation(String text) {
+        Condition c = parseCorrelationCondition(text);
+        return c == null ? parseActivationCondition(text) : c;
     }
 
     private static ActivationCondition actConditionFromBasics(String field, ConditionRelation relation, String value) {

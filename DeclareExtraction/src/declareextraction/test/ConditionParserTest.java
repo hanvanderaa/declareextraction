@@ -8,57 +8,62 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static declareextraction.textprocessing.ConditionParser.parseCondition;
+import static declareextraction.textprocessing.ConditionParser.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConditionParserTest {
 
-    /*
-     * Activation Condition format: $field ( (higher|greater|more|smaller|lower|less) than [or equal to] | ( is [not] | [not] in) ) $value+
-     */
     @Test
     public void testActivationCondition() {
         Map<String, String> textToConditionRuMString = new HashMap<>();
         //ActivationCatCondition
         textToConditionRuMString.put("source not in car duck dolphin", "A.source not in (car, duck, dolphin)");
-        textToConditionRuMString.put("source in grass tree", "A.source in (grass, tree)");
+        textToConditionRuMString.put("source is in grass tree", "A.source in (grass, tree)");
         textToConditionRuMString.put("source is black", "A.source is black");
         textToConditionRuMString.put("format is not zipped", "A.format is not zipped");
 
         //ActivationNumCondition
-        textToConditionRuMString.put("value greater than 6.0", "A.value > 6.0");
+        textToConditionRuMString.put("price point is greater than 6.0", "A.price_point > 6.0");
         textToConditionRuMString.put("value greater than or equal to 5.9999", "A.value >= 5.9999");
         textToConditionRuMString.put("value is two", "A.value = 2.0");
-        textToConditionRuMString.put("value smaller than or equal to 4.123", "A.value <= 4.123");
-        textToConditionRuMString.put("value smaller than five", "A.value < 5.0");
+        textToConditionRuMString.put("tree size smaller than or equal to 4.123", "A.tree_size <= 4.123");
+        textToConditionRuMString.put("value is smaller than five", "A.value < 5.0");
         textToConditionRuMString.put("value is not -1", "A.value != -1.0"); //is this on in RuM?
 
         for (Map.Entry<String, String> entry : textToConditionRuMString.entrySet()) {
-            Condition c = parseCondition(entry.getKey(), Condition.ConditionType.ACTIVATION);
+            Condition c = parseActivationCondition(entry.getKey());
             assertNotNull(c, entry.getKey());
             assertEquals(entry.getValue(), c.toRuMString());
         }
     }
 
-    /*
-     * Correlation Condition format: (same | different) $field
-     */
+    @Test
+    public void testActivationConditions() {
+        String text = "source not in car duck dolphin and price point is greater than 6.0 or value is not -1";
+        String result = parseActivationConditions(text);
+        assertEquals("A.source not in (car, duck, dolphin) and A.price_point > 6.0 or A.value != -1.0", result);
+    }
+
     @Test
     public void testCorrelationCondition() {
         Map<String, String> textToConditionRuMString = new HashMap<>();
-        textToConditionRuMString.put("same date", "same date");
-        textToConditionRuMString.put("different timestamp", "different timestamp");
+        textToConditionRuMString.put("date is same", "same date");
+        textToConditionRuMString.put("timestamp hour is different", "different timestamp_hour");
 
         for (Map.Entry<String, String> entry : textToConditionRuMString.entrySet()) {
-            Condition c = parseCondition(entry.getKey(), Condition.ConditionType.CORRELATION);
+            Condition c = parseCorrelationCondition(entry.getKey());
             assertNotNull(c, entry.getKey());
             assertEquals(entry.getValue(), c.toRuMString());
         }
     }
 
-    /*
-     * Activation Constraint format: between $int and $int $timeunit
-     */
+    @Test
+    public void testActivationOrCorrelationConditions() {
+        String text = "source is different and price point is same or value is not -1";
+        String result = parseActivationOrCorrelationConditions(text);
+        assertEquals("different source and same price_point or A.value != -1.0", result);
+    }
+
     @Test
     public void testTimeCondition() {
         Map<String, String> textToConditionRuMString = new HashMap<>();
@@ -70,8 +75,10 @@ class ConditionParserTest {
         textToConditionRuMString.put("at most eight seconds", "0,8,s");
         textToConditionRuMString.put("at most 23 days", "0,23,d");
 
+        textToConditionRuMString.put("not before 10 and no later than 15 days", "10,15,d");
+
         for (Map.Entry<String, String> entry : textToConditionRuMString.entrySet()) {
-            Condition c = parseCondition(entry.getKey(), Condition.ConditionType.TIME);
+            Condition c = parseTimeCondition(entry.getKey());
             assertNotNull(c, entry.getKey());
             assertEquals(entry.getValue(), c.toRuMString());
         }
