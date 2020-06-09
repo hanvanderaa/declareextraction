@@ -4,6 +4,7 @@ import declareextraction.constructs.condition.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,7 +51,7 @@ class ConditionParserTest {
         map.put("date is same", "same date");
         map.put("timestamp hour is different", "different timestamp_hour");
         map.put("the type is the same", "same type");
-        map.put("having the different price", "different price");
+        map.put("having the same type", "same type");
 
         for (Map.Entry<String, String> entry : map.entrySet()) {
             Condition c = parseCorrelationCondition(entry.getKey());
@@ -61,14 +62,20 @@ class ConditionParserTest {
 
     @Test
     public void testActivationOrCorrelationConditions() {
-        String text = "source is different and price point is same or value is not -1";
-        String result = parseActivationOrCorrelationConditions(text);
-        assertEquals("different source and same price_point or A.value != -1.0", result);
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("source is different and price point is same or value is not -1", "different source and same price_point or A.value != -1.0");
+        map.put("the price is the same", "same price");
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            final String s = parseActivationOrCorrelationConditions(entry.getKey());
+            assertNotNull(entry.getKey());
+            assertEquals(entry.getValue(), s);
+        }
     }
 
     @Test
     public void testTimeCondition() {
-        final Map<String, String> map = new HashMap<>();
+        final Map<String, String> map = new LinkedHashMap<>();
         map.put("between 5 and 6 seconds", "5,6,s");
         map.put("between one and 2.0 minutes", "1,2,m");
         map.put("between 112 and 234 hours", "112,234,h");
@@ -79,7 +86,8 @@ class ConditionParserTest {
 
         map.put("not before 10 and no later than 15 days", "10,15,d");
 
-        map.put("after 1 days", "1,1,d");
+        map.put("after 1 day", "1,1,d");
+        map.put("after 50 to 68 seconds", "50,68,s");
         map.put("after 5 to 6 minutes", "5,6,m");
 
         for (Map.Entry<String, String> entry : map.entrySet()) {

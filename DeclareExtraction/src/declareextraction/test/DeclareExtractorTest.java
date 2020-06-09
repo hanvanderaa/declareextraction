@@ -57,13 +57,9 @@ class DeclareExtractorTest {
     @Test
     public void RuMPrintConstraint() {
         //generic test method
-        String text = "once the results are clear the employee is notified"; //"immediately after the invoice is not paid the customer does not nicely immediately nicely enter immediately";
+        String text = "after building is closed staff must leave";
         DeclareConstraint dc = getOnlyConstraintFromSentence(text);
         System.out.println(dc.toRuMString());
-
-        System.out.println();
-        DeclareConstraint dc2 = getOnlyConstraintFromSentence("invoice is created");
-        System.out.println(dc2.toRuMString());
     }
 
     @Test

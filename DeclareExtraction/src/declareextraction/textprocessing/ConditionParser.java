@@ -16,7 +16,7 @@ public class ConditionParser {
     private final static Pattern corrPattern2 = Pattern.compile("^(?:having )?(?:the )?(same|different) (.*)$");
     private final static Pattern timePattern1 = Pattern.compile("^(?:between (.*) and|in|no later than|at most) (.*) (days|hours|minutes|seconds)$");
     private final static Pattern timePattern2 = Pattern.compile("^(?:(?:not before|no earlier than) (.+?)(?: )?(days|hours|minutes|seconds)?) and (?:(?:within|not after|no later than) (.+?)(?: )?(days|hours|minutes|seconds)?)$");
-    private final static Pattern timePattern3 = Pattern.compile("^(?:after) (.*?) (?:to (.*) )?(days|hours|minutes|seconds)$");
+    private final static Pattern timePattern3 = Pattern.compile("^(?:after) (.*?) (?:to (.*) )?(day|hour|minute|second)(s)?$");
 
     public static String parseCondition(String text, Condition.ConditionType type) {
         switch (type) {
@@ -106,7 +106,7 @@ public class ConditionParser {
             }
         } else if ((m = timePattern3.matcher(text)).find()) {
             start = parseDouble(m.group(1));
-            period = m.group(3);
+            period = m.group(3) + "s";
             if (m.group(2) == null) {
                 end = parseDouble(m.group(1));
             } else {
