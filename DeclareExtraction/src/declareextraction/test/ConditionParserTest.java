@@ -46,11 +46,13 @@ class ConditionParserTest {
 
     @Test
     public void testCorrelationCondition() {
-        Map<String, String> textToConditionRuMString = new HashMap<>();
-        textToConditionRuMString.put("date is same", "same date");
-        textToConditionRuMString.put("timestamp hour is different", "different timestamp_hour");
+        Map<String, String> map = new HashMap<>();
+        map.put("date is same", "same date");
+        map.put("timestamp hour is different", "different timestamp_hour");
+        map.put("the type is the same", "same type");
+        map.put("having the different price", "different price");
 
-        for (Map.Entry<String, String> entry : textToConditionRuMString.entrySet()) {
+        for (Map.Entry<String, String> entry : map.entrySet()) {
             Condition c = parseCorrelationCondition(entry.getKey());
             assertNotNull(c, entry.getKey());
             assertEquals(entry.getValue(), c.toRuMString());
@@ -66,18 +68,21 @@ class ConditionParserTest {
 
     @Test
     public void testTimeCondition() {
-        Map<String, String> textToConditionRuMString = new HashMap<>();
-        textToConditionRuMString.put("between 5 and 6 seconds", "5,6,s");
-        textToConditionRuMString.put("between one and 2.0 minutes", "1,2,m");
-        textToConditionRuMString.put("between 112 and 234 hours", "112,234,h");
-        textToConditionRuMString.put("between 1.2 and 6.9999 days", "1,6,d");
+        final Map<String, String> map = new HashMap<>();
+        map.put("between 5 and 6 seconds", "5,6,s");
+        map.put("between one and 2.0 minutes", "1,2,m");
+        map.put("between 112 and 234 hours", "112,234,h");
+        map.put("between 1.2 and 6.9999 days", "1,6,d");
 
-        textToConditionRuMString.put("at most eight seconds", "0,8,s");
-        textToConditionRuMString.put("at most 23 days", "0,23,d");
+        map.put("at most eight seconds", "0,8,s");
+        map.put("at most 23 days", "0,23,d");
 
-        textToConditionRuMString.put("not before 10 and no later than 15 days", "10,15,d");
+        map.put("not before 10 and no later than 15 days", "10,15,d");
 
-        for (Map.Entry<String, String> entry : textToConditionRuMString.entrySet()) {
+        map.put("after 1 days", "1,1,d");
+        map.put("after 5 to 6 minutes", "5,6,m");
+
+        for (Map.Entry<String, String> entry : map.entrySet()) {
             Condition c = parseTimeCondition(entry.getKey());
             assertNotNull(c, entry.getKey());
             assertEquals(entry.getValue(), c.toRuMString());

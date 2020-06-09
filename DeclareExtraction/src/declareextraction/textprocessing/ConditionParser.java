@@ -10,11 +10,13 @@ import java.util.regex.Pattern;
 public class ConditionParser {
 
     private final static String andOrSeparator = "((?<=( (and|or) (?!equal to)))|(?=( (and|or) (?!equal to))))";
-    private final static Pattern activatCat = Pattern.compile("^(.+?)( is(?: not)?(?: in| equal to)?|(?: not)?(?: in) )(.+)$");
-    private final static Pattern activatNum = Pattern.compile("^(.+?)( (?:is )?(?:(greater|higher|more|smaller|lower|less) )than (?:or equal to )?)(.+)$");
+    private final static Pattern activationCat = Pattern.compile("^(.+?)( is(?: not)?(?: in| equal to)?|(?: not)?(?: in) )(.+)$");
+    private final static Pattern activationNum = Pattern.compile("^(.+?)( (?:is )?(?:(greater|higher|more|smaller|lower|less) )than (?:or equal to )?)(.+)$");
+    private final static Pattern corrPattern1 = Pattern.compile("^(?:the )?(.*) is (?:the )?(same|different)$");
+    private final static Pattern corrPattern2 = Pattern.compile("^(?:having )?(?:the )?(same|different) (.*)$");
     private final static Pattern timePattern1 = Pattern.compile("^(?:between (.*) and|in|no later than|at most) (.*) (days|hours|minutes|seconds)$");
     private final static Pattern timePattern2 = Pattern.compile("^(?:(?:not before|no earlier than) (.+?)(?: )?(days|hours|minutes|seconds)?) and (?:(?:within|not after|no later than) (.+?)(?: )?(days|hours|minutes|seconds)?)$");
-    private final static Pattern corrPattern = Pattern.compile("^(.*) is (same|different)$");
+    private final static Pattern timePattern3 = Pattern.compile("^(?:after) (.*?) (?:to (.*) )?(days|hours|minutes|seconds)$");
 
     public static String parseCondition(String text, Condition.ConditionType type) {
         switch (type) {
@@ -56,7 +58,7 @@ public class ConditionParser {
 
     public static ActivationCondition parseActivationCondition(String text) {
         Matcher m;
-        if ((m = activatNum.matcher(text)).find()) {
+        if ((m = activationNum.matcher(text)).find()) {
             String field = String.join("_", m.group(1).split("\\s+"));
             boolean orEquals = m.group(2).contains("equal");
             boolean greater = m.group(3).equals("greater") || m.group(3).equals("higher") || m.group(3).equals("more");
@@ -68,7 +70,7 @@ public class ConditionParser {
                 rel = orEquals ? ConditionRelation.LOWER_EQUAL : ConditionRelation.LOWER;
             }
             return actConditionFromBasics(field, rel, m.group(4).trim());
-        } else if ((m = activatCat.matcher(text)).find()) {
+        } else if ((m = activationCat.matcher(text)).find()) {
             String field = String.join("_", m.group(1).split("\\s+"));
             boolean falseCond = m.group(2).contains("not");
 
@@ -85,28 +87,50 @@ public class ConditionParser {
 
     public static TimeCondition parseTimeCondition(String text) {
         Matcher m;
+        Double start;
+        Double end;
+        String period;
         if ((m = timePattern1.matcher(text)).find()) {
-            Double start = m.group(1) == null ? 0D : parseDouble(m.group(1));
-            Double end = parseDouble(m.group(2));
-            return timeConditionFromBasics(start, end, m.group(3));
+            start = m.group(1) == null ? 0D : parseDouble(m.group(1));
+            end = parseDouble(m.group(2));
+            period = m.group(3);
         } else if ((m = timePattern2.matcher(text)).find()) {
-            Double start = parseDouble(m.group(1));
-            Double end = parseDouble(m.group(3));
+            start = parseDouble(m.group(1));
+            end = parseDouble(m.group(3));
             if (m.group(2) != null) {
-                return timeConditionFromBasics(start, end, m.group(2));
+                period = m.group(2);
             } else if (m.groupCount() > 3) {
-                return timeConditionFromBasics(start, end, m.group(4));
+                period = m.group(4);
+            } else {
+                return null;
             }
+        } else if ((m = timePattern3.matcher(text)).find()) {
+            start = parseDouble(m.group(1));
+            period = m.group(3);
+            if (m.group(2) == null) {
+                end = parseDouble(m.group(1));
+            } else {
+                end = parseDouble(m.group(2));
+            }
+        } else {
+            return null;
         }
 
-        return null;
+        return timeConditionFromBasics(start, end, period);
     }
 
     public static CorrelationCondition parseCorrelationCondition(String text) {
         Matcher m;
-        if ((m = corrPattern.matcher(text)).find()) {
-            String field = String.join("_", m.group(1).split("\\s+"));
+        if ((m = corrPattern1.matcher(text)).find()) {
+            final String field = String.join("_", m.group(1).split("\\s+"));
             if (m.group(2).equals("same")) {
+                return new CorrelationCondition(false, field);
+            } else {
+                return new CorrelationCondition(true, field);
+            }
+        } else if ((m = corrPattern2.matcher(text)).find()) {
+            final String field = String.join("_", m.group(2).split("\\s+"));
+            if (m.group(1).equals("same")) {
                 return new CorrelationCondition(false, field);
             } else {
                 return new CorrelationCondition(true, field);
