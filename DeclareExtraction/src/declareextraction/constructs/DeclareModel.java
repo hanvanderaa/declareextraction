@@ -61,6 +61,10 @@ public class DeclareModel {
 		}
 		return res;
 	}
+
+	public boolean isEmpty() {
+		return constraints.isEmpty();
+	}
 	
 	
 }

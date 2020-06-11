@@ -1,7 +1,8 @@
 package declareextraction.textprocessing;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import declareextraction.constructs.Action;
@@ -12,7 +13,45 @@ import declareextraction.constructs.TextModel;
 import declareextraction.utils.WordClasses;
 
 public class DeclareConstructor {
-	public DeclareModel convertToDeclareModel(TextModel textModel) {
+
+	private TextParser parser;
+	private boolean suppressOutput = false;
+	private PrintStream ogOut = System.out;
+	private PrintStream ogErr = System.err;
+
+	public DeclareConstructor() {
+		parser = new TextParser();
+	}
+
+	public void suppressConsoleOutput() {
+		this.suppressOutput = true;
+	}
+
+	public DeclareModel convertToDeclareModel(String text) {
+		if (suppressOutput) {
+			this.redirectSysOutAndErr();
+		}
+		// first try pattern based matching
+		DeclareModel declareModel = PatternBasedDeclareConstructor.extractDeclareConstraints(text);
+		if (!declareModel.isEmpty()) {
+			System.out.println("pattern matching solution found");
+			if (suppressOutput) {
+				this.returnSysOutAndErr();
+			}
+			return declareModel;
+		}
+		// else use parser
+		System.out.println("no matching pattern found, using text parser for constraint extraction");
+		TextModel textModel = parser.parseConstraintString(text);
+		declareModel = convertToDeclareModel(textModel);
+
+		if (suppressOutput) {
+			this.returnSysOutAndErr();
+		}
+		return declareModel;
+	}
+
+	private DeclareModel convertTextModelToDeclare(TextModel textModel) {
 		DeclareModel declareModel = new DeclareModel(textModel.getText());
 
 		if (textModel.getInterrelations().isEmpty() && textModel.getActions().size() == 1) {
@@ -36,6 +75,18 @@ public class DeclareConstructor {
 				System.out.println("Constraint identified: " + constraint);
 			}
 		}
+		return declareModel;
+	}
+
+	@Deprecated
+	// use convertToDeclareModel(String text) instead;
+	public DeclareModel convertToDeclareModel(TextModel textModel) {
+		DeclareModel declareModel = PatternBasedDeclareConstructor.extractDeclareConstraints(textModel.getText());
+		if (!declareModel.isEmpty()) {
+			return declareModel;
+		}
+		// else use parser
+		declareModel = convertToDeclareModel(textModel);
 		return declareModel;
 	}
 
@@ -163,5 +214,22 @@ public class DeclareConstructor {
 			}
 		}
 		return false;
+	}
+
+	private void redirectSysOutAndErr() {
+		ogOut = System.out;
+		ogErr = System.err;
+		PrintStream voidStream = new PrintStream(new OutputStream() {
+			public void write(int b) {
+
+			}
+		});
+		System.setOut(voidStream);
+		System.setErr(voidStream);
+	}
+
+	private void returnSysOutAndErr() {
+		System.setOut(ogOut);
+		System.setErr(ogErr);
 	}
 }

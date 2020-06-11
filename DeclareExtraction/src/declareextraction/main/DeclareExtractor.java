@@ -63,24 +63,17 @@ public class DeclareExtractor {
 	
 	
 	private void runSingleConstraint(String text) {
-		parser = new TextParser();
 		declareConstructor = new DeclareConstructor();
 		
-		System.out.println("Parsing case: " + text);
-		TextModel textModel = parser.parseConstraintString(text);
-		
-		System.out.println("Extracted actions:");
-		for (Action a : textModel.getActions()) {
-			System.out.println(a);
-		}
-		
-		System.out.println("Extracted relations:");
-		for (Interrelation rel : textModel.getInterrelations()) {
-			System.out.println(rel);
-		}
-		
-		DeclareModel dm = declareConstructor.convertToDeclareModel(textModel);
-			dm.addTextModel(textModel);
+//		System.out.println("Parsing case: " + text);
+//		TextModel textModel = parser.parseConstraintString(text);
+//
+//		System.out.println("Extracted actions:");
+//		for (Action a : textModel.getActions()) {
+//			System.out.println(a);
+//		}
+
+		DeclareModel dm = declareConstructor.convertToDeclareModel(text);
 	}
 	
 	

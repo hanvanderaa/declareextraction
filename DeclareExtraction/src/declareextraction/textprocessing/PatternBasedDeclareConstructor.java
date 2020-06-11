@@ -12,7 +12,7 @@ public class PatternBasedDeclareConstructor {
 
 
 
-	private Pattern[] existPatterns = new Pattern[]{
+	private static Pattern[] existPatterns = new Pattern[]{
 			Pattern.compile("^(?:activity )?(?<actA>.*) eventually (occurs|happens|exists|takes place)(?: in a (trace|case))?$"),
 			Pattern.compile("^(?:activity )?(?<actA>.*) (occurs|happens|exists|takes place) at least once(?: in a (trace|case))?$"),
 			Pattern.compile("^(?:activity )?(?<actA>.*) always (occurs|happens|exists|takes place)(?: in a (trace|case))?$"),
@@ -20,41 +20,48 @@ public class PatternBasedDeclareConstructor {
 			Pattern.compile("^(?:activity )?(?<actA>.*) must (occur|happen|exist|take place) at least once(?: in a (trace|case))?$")
 	};
 
-	private Pattern[] absencePatterns = new Pattern[]{
+	private static Pattern[] absencePatterns = new Pattern[]{
 			Pattern.compile("^(?:activity )?(?<actA>.*) (cannot|must not|may not|does not) (occur|happen|exist|take place)(?: in a (trace|case))?$"),
 			Pattern.compile("^(?:activity )?(?<actA>.*) never (occurs|happens|exists|takes place)(?: in a (trace|case))?$"),
 			Pattern.compile("^(?:activity )?(?<actA>.*) is always missing(?: in a (trace|case))?$"),
 	};
 
 
-	Map<Pattern[], ConstraintType> unaryPatterns = new HashMap<Pattern[], ConstraintType>() {{
+	static Map<Pattern[], ConstraintType> unaryPatterns = new HashMap<Pattern[], ConstraintType>() {{
 		put(existPatterns, ConstraintType.EXISTENCE);
 		put(absencePatterns, ConstraintType.ABSENCE);
 	}};
 
 
 	public static void main(String[] args) {
-		PatternBasedDeclareConstructor c = new PatternBasedDeclareConstructor();
-		c.extractDeclareConstraints("activity registering must happen at least once in a trace");
-		c.extractDeclareConstraints("registering must not happen in a trace");
-		c.extractDeclareConstraints("registering cannot happen in a trace");
+//		extractDeclareConstraints("activity registering must happen at least once in a trace");
+//		extractDeclareConstraints("registering must not happen in a trace");
+//		extractDeclareConstraints("registering cannot happen in a trace");
 //		c.extractDeclareConstraints("the amount is greater than 5");
+		DeclareModel model;
+		DeclareConstructor dc = new DeclareConstructor();
+//		dc.suppressConsoleOutput();
+
+		model = dc.convertToDeclareModel("activity registering must happen at least once in a trace");
+		System.out.println(model);
+		model =dc.convertToDeclareModel("An order must be received, before it can be shipped");
+		System.out.println(model);
 	}
 
 
-	public DeclareModel extractDeclareConstraints(String text) {
-		System.out.println("Parsing: " + text);
+	public static DeclareModel extractDeclareConstraints(String text) {
+		System.out.println("\nParsing: " + text);
 		DeclareModel model = new DeclareModel(text);
 		DeclareConstraint constraint = extractConstraint(text);
 		if (constraint != null) {
-			System.out.println("Extracted constraint: " + constraint);
+//			System.out.println("Extracted constraint: " + constraint);
 			model.addConstraint(constraint);
 		}
 		return model;
 	}
 
 
-	private DeclareConstraint extractConstraint(String text) {
+	private static DeclareConstraint extractConstraint(String text) {
 		Matcher m;
 		for (Pattern[] patterns : unaryPatterns.keySet()) {
 			for (Pattern p : patterns) {
