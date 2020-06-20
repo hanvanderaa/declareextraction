@@ -86,7 +86,7 @@ public class DeclareConstructor {
 			return declareModel;
 		}
 		// else use parser
-		declareModel = convertToDeclareModel(textModel);
+		declareModel = convertTextModelToDeclare(textModel);
 		return declareModel;
 	}
 

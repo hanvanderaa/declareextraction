@@ -6,6 +6,7 @@ import declareextraction.constructs.condition.CorrelationCondition;
 import declareextraction.constructs.condition.TimeCondition;
 import declareextraction.textprocessing.ConditionParser;
 import declareextraction.textprocessing.DeclareConstructor;
+import declareextraction.textprocessing.PatternBasedDeclareConstructor;
 import declareextraction.textprocessing.TextParser;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -40,26 +41,26 @@ class DeclareExtractorTest {
     }
 
     @Test
-    public void singleConstraintNegative() {
+    public void negativeConstraints() {
         String text = "the customer does not enter after the invoice is not paid";
         DeclareConstraint dc1 = getOnlyConstraintFromSentence(text);
+        assertEquals("Not Succession[not pay the invoice, the customer enter] | | |", dc1.toRuMString());
 
         String text2 = "if the invoice is not paid the customer does not enter";
         DeclareConstraint dc2 = getOnlyConstraintFromSentence(text2);
-
-        assertEquals(dc1.toRuMString(), dc2.toRuMString());
+        assertEquals("Not Co-Existence[not pay the invoice, the customer enter] | | |", dc2.toRuMString());
 
         DeclareConstraint dc3 = new DeclareConstraint(ConstraintType.PRECEDENCE, new Action("not pay the invoice"), new Action("the customer enter"), true);
         dc3.getActionB().setNegative(true);
-        assertEquals(dc1.toRuMString(), dc3.toRuMString());
+        assertEquals("Not Precedence[not pay the invoice, the customer enter] | | |", dc3.toRuMString());
     }
 
     @Test
     public void RuMPrintConstraint() {
-        //generic test method
-        String text = "after building is closed staff must leave";
-        DeclareConstraint dc = getOnlyConstraintFromSentence(text);
-        System.out.println(dc.toRuMString());
+        //generic test method, uses the same method as RuM for extraction
+        final DeclareModel generatedModel = declareConstructor.convertToDeclareModel("if the invoice is not paid the customer does not enter");
+        assertEquals(1, generatedModel.getConstraints().size());
+        System.out.println(generatedModel.getConstraints().get(0).toRuMString());
     }
 
     @Test
@@ -91,7 +92,7 @@ class DeclareExtractorTest {
     public void constraintAlternativeCheck() {
         Map<String, ConstraintType> sentenceToConstraint = new HashMap<>();
         sentenceToConstraint.put("after the results are not cleared, the employee is notified", ConstraintType.ALTERNATE_PRECEDENCE);
-        sentenceToConstraint.put("if something happens, we will react", ConstraintType.ALTERNATE_RESPONSE);
+        //ALTERNATE_RESPONSE
         sentenceToConstraint.put("once a meeting must be arranged, it must be held", ConstraintType.ALTERNATE_SUCCESSION);
 
         for (Map.Entry<String, ConstraintType> entry: sentenceToConstraint.entrySet()) {
@@ -107,12 +108,12 @@ class DeclareExtractorTest {
     public void constraintNegativesCheck() {
         Map<String, ConstraintType> sentenceToConstraint = new HashMap<>();
         sentenceToConstraint.put("invoice is not made", ConstraintType.ABSENCE);
-        sentenceToConstraint.put("after the results are cleared, the employee is not notified", ConstraintType.PRECEDENCE);
-        sentenceToConstraint.put("if something happens, we will not react", ConstraintType.RESPONSE);
-        sentenceToConstraint.put("once a meeting must be arranged, it must be not held", ConstraintType.SUCCESSION);
-        sentenceToConstraint.put("the results are not displayed immediately, after the notification is received", ConstraintType.CHAIN_PRECEDENCE);
-        sentenceToConstraint.put("if something happens, we will not react instantly", ConstraintType.CHAIN_RESPONSE);
-        sentenceToConstraint.put("if a meeting must be arranged, it must not directly be held", ConstraintType.CHAIN_SUCCESSION);
+        sentenceToConstraint.put("after the results are cleared, the employee is not notified", ConstraintType.SUCCESSION);
+        sentenceToConstraint.put("if something happens, we will not react", ConstraintType.COEXISTENCE);
+        sentenceToConstraint.put("once a meeting must be arranged, it must be not held", ConstraintType.COEXISTENCE);
+        sentenceToConstraint.put("the results are not displayed immediately, after the notification is received", ConstraintType.SUCCESSION);
+        sentenceToConstraint.put("if something happens, we will not react instantly", ConstraintType.COEXISTENCE);
+        sentenceToConstraint.put("if a meeting must be arranged, it must not directly be held", ConstraintType.COEXISTENCE);
 
         for (Map.Entry<String, ConstraintType> entry: sentenceToConstraint.entrySet()) {
             DeclareConstraint dc = getOnlyConstraintFromSentence(entry.getKey());
@@ -139,18 +140,15 @@ class DeclareExtractorTest {
         threeCondConstraint.setTimeCondition(time2);
 
         assertEquals("Init[make an approval] |A.format is not zipped |112,234,h", twoCondConstraint.toRuMString());
-        assertEquals("Not Chain Precedence[receive the notification, display the results] |A.value < 5.0 |different originalvalue |0,3,s", threeCondConstraint.toRuMString());
+        assertEquals("Not Succession[receive the notification, display the results] |A.value < 5.0 |different originalvalue |0,3,s", threeCondConstraint.toRuMString());
     }
 
     @Test
-    public void failChainConstraint() {
-        //is not recognized as chain constraint since the clause is not next to the verb (StanfordParsing logic); only one clause is saved per action
-        //starting actionA with "immediately after" or "as soon" not possible either
-        //if the clauses were saved in a list, other relations, such as ATMOSTONCE or ATLEASTONCE could also probably be easily implemented
-        String text = "if the invoice is not paid the customer does not immediately nicely enter";
-        DeclareConstraint dc = getOnlyConstraintFromSentence(text);
-
-        assertEquals(ConstraintType.CHAIN_PRECEDENCE, dc.getType());
+    public void patternBasedExtractor() {
+        final TextModel textModel = new TextModel("b can only happen after a");
+        DeclareModel declareModel = PatternBasedDeclareConstructor.extractDeclareConstraints(textModel.getText());
+        assertEquals(1, declareModel.getConstraints().size());
+        assertEquals("Precedence[a, b] | | |", declareModel.getConstraints().get(0).toRuMString());
     }
 
     @Test

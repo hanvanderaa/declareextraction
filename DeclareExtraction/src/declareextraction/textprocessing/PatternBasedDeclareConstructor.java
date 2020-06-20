@@ -74,19 +74,6 @@ public class PatternBasedDeclareConstructor {
 	}};
 
 
-	public static void main(String[] args) {
-//		DeclareModel model;
-//		DeclareConstructor dc = new DeclareConstructor();
-//		dc.suppressConsoleOutput();
-//		DeclareModel model = dc.convertToDeclareModel("activity registering must happen at least once in a trace");
-		extractDeclareConstraints("activity a always occurs together with B");
-
-//		System.out.println(model);
-//		model =dc.convertToDeclareModel("An order must be received, before it can be shipped");
-//		System.out.println(model);
-	}
-
-
 	public static DeclareModel extractDeclareConstraints(String text) {
 		System.out.println("\nParsing: " + text);
 		DeclareModel model = new DeclareModel(text);
